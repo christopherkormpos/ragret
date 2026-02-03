@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ragret"
+version = "0.1.0"
+description = "Simple evaluation metrics for Retrieval-Augmented Generation (RAG) systems"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Christopher Kormpos" }
+]
+
+dependencies = [
+    "openai>=1.0.0",
+    "numpy>=1.23.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/christopherkormpos/ragret"
+Repository = "https://github.com/christopherkormpos/ragret"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ragret*"]
