@@ -1,5 +1,5 @@
 <p align="center">
-  <h2>ragret</h2>
+  <img src="/images/ragret" alt="TumorNet Backend Architecture" style="height: 100px;"/>
 </p>
 
 ## Overview
