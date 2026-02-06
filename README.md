@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="/images/ragret" alt="TumorNet Backend Architecture" style="height: 100px;"/>
+  <img src="./images/ragret.png" alt="TumorNet Backend Architecture" style="height: 200px;"/>
 </p>
 
 ## Overview
-**ragret** is a stable, not often changed lightweight evaluation framework for Retrieval-Augmented Generation (RAG) systems.
-The goal of ragret is simplicity: small, modular metrics that are easy to understand, extend, and integrate into existing pipelines. It was created from the need that other frameworks continiusly changed and the code from one version to another was useless. In this framework the focus is simple. Implement as you go. The OG metrics with no need to change your already established code.
+**ragret** is a stable, lightweight evaluation framework for Retrieval-Augmented Generation (RAG) systems that doesn’t change often.
+Its goal is simplicity: small, modular metrics that are easy to understand, extend, and integrate into existing pipelines. It was created out of the frustration with other frameworks constantly changing, making code from one version to the next useless. With **ragret**, the focus is clear: simple, implement-as-you-go metrics that you can rely on without having to rewrite your established code.
 
 ## Metrics
 **ragret** provides evaluation metrics for assessing different aspects of RAG system performance, including:
@@ -12,7 +12,7 @@ The goal of ragret is simplicity: small, modular metrics that are easy to unders
 - Context Recall
 - Context Precision
 - Response Relevancy
-- Product Relevancy
+- Product Relevancy (for systems related to product recommendation)
 
 ## Installation
 Use pip to install the package
@@ -53,7 +53,7 @@ Expected output
     "unsupported_claims": [...]
 }
 ```
------------------------------------- --------------------------------
+--
 
 ## Contact
 If you encounter any issues or bugs with the application, or if you face difficulties while building the project locally, feel free to reach out to me:
