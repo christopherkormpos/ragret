@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="./images/ragret.png" alt="TumorNet Backend Architecture" style="height: 200px;"/>
+  <picture>
+    <source srcset="./images/ragret-dark.png" media="(prefers-color-scheme: dark)">
+    <img src="./images/ragret-light.png" alt="TumorNet Backend Architecture" style="height:200px;">
+  </picture>
 </p>
 
 ## Overview
