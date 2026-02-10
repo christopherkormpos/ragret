@@ -4,10 +4,12 @@
     <img src="./images/ragret-light.png" alt="TumorNet Backend Architecture" style="height:200px;">
   </picture>
 </p>
+<p align="center">
+  <strong>RAG evaluation with fewer regrets.</strong><br/>
+</p>
 
-## Overview
-**ragret** is a stable, lightweight evaluation framework for Retrieval-Augmented Generation (RAG) systems that doesn’t change often.
-Its goal is simplicity: small, modular metrics that are easy to understand, extend, and integrate into existing pipelines. It was created out of the frustration with other frameworks constantly changing, making code from one version to the next useless. With **ragret**, the focus is clear: simple, implement-as-you-go metrics that you can rely on without having to rewrite your established code.
+**ragret** is a stable, lightweight evaluation framework for Retrieval-Augmented Generation (RAG) systems that doesn’t change often.<br>
+Its goal is simplicity: small, modular metrics that are easy to understand, extend, and integrate into existing pipelines. It was created out of the frustration with other frameworks constantly changing, making code from one version to the next useless. With **ragret**, the focus is clear: simple, implement-as-you-go metrics that you can rely on without having to rewrite your established code or digging through docs to figure out what changed overnight in your favorite framework.
 
 ## Metrics
 **ragret** provides evaluation metrics for assessing different aspects of RAG system performance, including:
