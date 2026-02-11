@@ -42,7 +42,7 @@ Faithfulness(provider="openai", api_key="your-api-key-here")
 <p align="center">
   <picture>
     <source srcset="./images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="./images/supported-models-light.png" alt="supported models" style="height:100px;">
+    <img src="./images/supported-models-light.png" alt="supported models" style="height:250px;">
   </picture> 
 
 **ragret** supports multiple LLM providers for different tasks.<br>
