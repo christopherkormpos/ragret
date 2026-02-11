@@ -8,8 +8,8 @@
 # 2. Compute the cosine similarity between the embedding of the user input and the embedding of each generated question
 # 3. Take the average of these cosine similarity scores to get the Answer Relevancy
 import os
-from openai import OpenAI
 import logging
+from llm_adapter import LLMAdapter
 import numpy as np
 from numpy.typing import NDArray
 
@@ -20,14 +20,32 @@ logging.basicConfig(
 )
 
 class AnswerRelevancy:
-    def __init__(self, api_key: str | None = None):
-        self.api_key = api_key or os.getenv("TEST_API_KEY")
-        if not self.api_key:
-            raise ValueError("Missing OpenAI API key")
+    def __init__(self, 
+                 provider:str, 
+                 api_key: str | None = None, 
+                 ollama_url: str | None = None, 
+                 model: str | None = None):
         
-        #OpenAI client. You can use any client you wish as long as the response object is handled accordingly.
-        self.client = OpenAI(api_key=self.api_key)
+        supported_clients = ["openai","anthropic","ollama"]
+        self.provider = provider
+        self.api_key = api_key or os.getenv("API_KEY")
+        
+        #Optional: model, ollama_url (for ollama use)
+        self.ollama_url = ollama_url
+        self.model = model
 
+        # self.provider must match any of the supported clients
+        if self.provider not in supported_clients:
+            raise ValueError(f"Incorrect LLM provider. Please choose from available clients: {supported_clients}")
+        if not self.api_key:
+            raise ValueError("Please provide a valid API key")
+
+        # Based on the provider 
+        self.llm = LLMAdapter(provider=self.provider, 
+                              api_key=self.api_key,
+                              ollama_url=self.ollama_url,
+                              model=self.model)
+        
 # Function that takes an llm_answer as input 
 # Returns n number of questions that could be questioned to get the same llm_answer output
     def _generate_artificial_questions(self, llm_answer, n) -> list[str]:
@@ -45,8 +63,7 @@ Response:
 {llm_answer}
 """
         try:
-            response = self.client.responses.create(model="gpt-4.1-nano-2025-04-14", input=prompt)
-            derived_questions = response.output_text
+            derived_questions = self.llm.generate(prompt)
 
             # Make the response a list that splits each sentence on '\n'
             artificial_questions = derived_questions.split("\n")
@@ -58,7 +75,7 @@ Response:
             logging.error(f"Error on Answer Relevancy |_generate_artificial_questions|: {error}")
             raise
 
-# Function that given a text input, it computes the vector embedding of the input and returns it    
+# Function that given a text input, it computes the vector embedding of the input and returns it  
     def _compute_similarity(self, input) -> NDArray[np.float32]:
         try:
             vector_embedding = self.client.embeddings.create(input=input, model="text-embedding-3-small").data[0].embedding
@@ -67,7 +84,7 @@ Response:
             logging.error(f"Error on Answer Relevancy |_compute_similarity|: {error}")
             raise
 
-# Main _calculate answer relevancy function. Calls _generate_artificial_questions function and after making
+# Main score answer relevancy function. Calls _generate_artificial_questions function and after making
 # vector embeddings of the user query and the answers generated calculates the answer relevancy metric
 # using the fomula: answer_relevancy = Σ(cosine_similarity) / n
     def score(self, user_input, llm_answer, n=3) -> dict:

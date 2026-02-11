@@ -10,7 +10,7 @@
 # 3. Compute recall using the formula:
 # Context Recall = (Number of claims in the retrieved context) / (Total number of claims in referece)
 import os
-from openai import OpenAI
+from llm_adapter import LLMAdapter
 import logging
 
 # Logging configuration for debugging
@@ -20,13 +20,31 @@ logging.basicConfig(
 )
 
 class ContextRecall:
-    def __init__(self, api_key: str | None = None):
-        self.api_key = api_key or os.getenv("TEST_API_KEY")
-        if not self.api_key:
-            raise ValueError("Missing OpenAI API key")
+    def __init__(self, 
+                 provider:str, 
+                 api_key: str | None = None, 
+                 ollama_url: str | None = None, 
+                 model: str | None = None):
         
-        #OpenAI client. You can use any client you wish as long as the response object is handled accordingly.
-        self.client = OpenAI(api_key=self.api_key)
+        supported_clients = ["openai","anthropic","ollama"]
+        self.provider = provider
+        self.api_key = api_key or os.getenv("API_KEY")
+        
+        #Optional: model, ollama_url (for ollama use)
+        self.ollama_url = ollama_url
+        self.model = model
+
+        # self.provider must match any of the supported clients
+        if self.provider not in supported_clients:
+            raise ValueError(f"Incorrect LLM provider. Please choose from available clients: {supported_clients}")
+        if not self.api_key:
+            raise ValueError("Please provide a valid API key")
+
+        # Based on the provider 
+        self.llm = LLMAdapter(provider=self.provider, 
+                              api_key=self.api_key,
+                              ollama_url=self.ollama_url,
+                              model=self.model)
         
 # Function that takes as input the CONTEXT retrieved from the vector db that is present in the data samples and returns 
 # a list of strings that represent the claims that are stated in the context.
@@ -47,14 +65,11 @@ Context:
 {context}
 """
         try:
-            response = self.client.responses.create(model="gpt-4.1-nano-2025-04-14", input=prompt)
-            derived_response_claims = response.output_text
-
+            derived_response_claims = self.llm.generate(prompt)
             # Make the response a list that splits each sentence on '\n'
-            claims = derived_response_claims.split("\n")
-            for i in range(len(claims)):
-                claims[i] = claims[i].rstrip()
+            claims = [c.strip() for c in derived_response_claims.split("\n") if c.strip()]
             return claims
+        
         except Exception as error:
             logging.error(f"Error on Context Recall: |_claim_extractor| : {error}")
             raise
@@ -80,14 +95,14 @@ SUPPORTED
 NOT_SUPPORTED
 """
         try:
-            response = self.client.responses.create(model="gpt-4.1-nano-2025-04-14", input=prompt)
-            check_result = response.output_text
-            return check_result == "SUPPORTED"
+            check_result = self.llm.generate(prompt)
+            return check_result.strip().upper() == "SUPPORTED"
+        
         except Exception as error:
             logging.error(f"Error on Context Recall: |_claim_checker| : {error}")
             raise
 
-# Main calculate context recall function. Calls both _claim_extractor and claim_checker and calculates the context recall 
+# Main score context recall function. Calls both _claim_extractor and claim_checker and calculates the context recall 
 # of a response using the fomula: context recall = len(supported context claims) / len(total context claims). 
 # Supported claims refers to supported CONTEXT claims
     def score(self, context, llm_answer) -> dict:

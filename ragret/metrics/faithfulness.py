@@ -9,8 +9,10 @@
 # 3. Compute the faithfulness score using the formula:
 # Faithfulnes = (Number of claims in the response supported by the retrieved context) / (Total Number of claims in response)
 import os
-from openai import OpenAI
 import logging
+from llm_adapter import LLMAdapter
+from dotenv import load_dotenv
+load_dotenv()
 
 # Logging configuration for debugging
 logging.basicConfig(
@@ -19,16 +21,34 @@ logging.basicConfig(
 )
 
 class Faithfulness:
-    def __init__(self, api_key: str | None = None):
-        self.api_key = api_key or os.getenv("TEST_API_KEY")
+    def __init__(self, 
+                 provider:str, 
+                 api_key: str | None = None, 
+                 ollama_url: str | None = None, 
+                 model: str | None = None):
+        
+        supported_clients = ["openai","anthropic","ollama"]
+        self.provider = provider
+        self.api_key = api_key or os.getenv("API_KEY")
+        
+        #Optional: model, ollama_url (for ollama use)
+        self.ollama_url = ollama_url
+        self.model = model
+
+        # self.provider must match any of the supported clients
+        if self.provider not in supported_clients:
+            raise ValueError(f"Incorrect LLM provider. Please choose from available clients: {supported_clients}")
         if not self.api_key:
-            raise ValueError("Missing OpenAI API key")
+            raise ValueError("Please provide a valid API key")
+
+        # Based on the provider 
+        self.llm = LLMAdapter(provider=self.provider, 
+                              api_key=self.api_key,
+                              ollama_url=self.ollama_url,
+                              model=self.model)
         
-        #OpenAI client. You can use any client you wish as long as the response object is handled accordingly.
-        self.client = OpenAI(api_key=self.api_key)
-        
-# Function that takes as input the RESPONSE generated from the LLM that is present in the data samples and returns 
-# a list of strings that represent the claims that are stated in a response.
+# Function that takes as input the RESPONSE generated from the LLM
+# Returns a list of strings that represent the claims that are stated in a response.
     def _claim_extractor(self, answer) -> list[str]:
         prompt = f"""
 You are extracting factual claims from an answer.
@@ -46,20 +66,18 @@ Answer:
 {answer}
 """
         try:
-            response = self.client.responses.create(model="gpt-4.1-nano-2025-04-14", input=prompt)
-            derived_response_claims = response.output_text
-
+            derived_response_claims = self.llm.generate(prompt)
             # Make the response a list that splits each sentence on '\n'
-            claims = derived_response_claims.split("\n")
-            for i in range(len(claims)):
-                claims[i] = claims[i].rstrip()
+            claims = [c.strip() for c in derived_response_claims.split("\n") if c.strip()]
             return claims
+        
         except Exception as error:
             logging.error(f"Error on Faithfulness: |_claim_extractor| : {error}")
             raise
         
-# Function that takes the claim made from the _claim_extractor function and sees wether it is supported from the 
-# retrieved CONTEXT or not. If yes it returns the output to be added on the supported_claims list.
+# Function that takes the claim made from the _claim_extractor function 
+# and decides wether it is supported from the retrieved CONTEXT or not. 
+# If yes it returns the output to be added on the supported_claims list.
     def _claim_checker(self, claim, context) -> bool:
         prompt = f"""
 You are checking whether a claim is supported by the given context.
@@ -78,15 +96,15 @@ SUPPORTED
 NOT_SUPPORTED
 """
         try:
-            response = self.client.responses.create(model="gpt-4.1-nano-2025-04-14", input=prompt)
-            check_result = response.output_text
-            return check_result == "SUPPORTED"
+            check_result = self.llm.generate(prompt)
+            return check_result.strip().upper() == "SUPPORTED"
         except Exception as error:
             logging.error(f"Error on Faithfulness: |_claim_checker| : {error}")
             raise    
         
-# Main calculate faithfulness function. Calls both _claim_extractor and claim_checker and calculates the faithfulness 
-# of a response using the fomula: faithfulness = len(supported llm_response claims) / len(llm_response claims).
+# Main score faithfulness function. Calls both _claim_extractor and claim_checker and calculates the faithfulness 
+# of a response using the fomula: 
+# faithfulness = len(supported llm_response claims) / len(llm_response claims).
 # Supported claims refers to supported RESPONSE claims
     def score(self, llm_answer, context) -> dict:
         try:

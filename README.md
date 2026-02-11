@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source srcset="./images/ragret-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="./images/ragret-light.png" alt="TumorNet Backend Architecture" style="height:200px;">
+    <img src="./images/ragret-light.png" alt="ragret logo" style="height:200px;">
   </picture>
 </p>
 <h2 align="center">
@@ -29,7 +29,26 @@ Or clone the repository:
 git clone https://github.com/christopherkormpos/ragret.git
 cd ragret
 ```
-You will need to set you enviromental variable "test_api_key" to your OpenAI API key.
+You will need to create a .env file and set you enviromental variable "API_KEY" to your providers API key 
+```bash
+API_KEY=your-api-key-here
+```
+Or you can pass it directly during class initialization.
+```python
+Faithfulness(provider="openai", api_key="your-api-key-here")
+```
+
+## Supported providers
+<p align="center">
+  <picture>
+    <source srcset="./images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
+    <img src="./images/supported-models-light.png" alt="supported models" style="height:100px;">
+  </picture> 
+
+**ragret** supports multiple LLM providers for different tasks.<br>
+For text generation (claim extraction, verification), you can use OpenAI, Anthropic, or Ollama.<br>
+For vector embeddings (semantic similarity calculations), OpenAI and Ollama are available.
+
 ## Usage
 All metrics are exposed on upper level. Therefore they can be imported as susch:
 ```python
