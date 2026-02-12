@@ -22,19 +22,21 @@ class ProductRelevancy:
                  provider:str, 
                  api_key: str | None = None, 
                  ollama_url: str | None = None, 
-                 model: str | None = None):
+                 model: str | None = None,
+                 embedding_model: str| None = None):
         
-        supported_clients = ["openai","anthropic","ollama"]
+        supported_clients = ["openai","ollama"]
         self.provider = provider
         self.api_key = api_key or os.getenv("API_KEY")
         
         #Optional: model, ollama_url (for ollama use)
         self.ollama_url = ollama_url
         self.model = model
+        self.embedding_model = embedding_model
 
         # self.provider must match any of the supported clients
         if self.provider not in supported_clients:
-            raise ValueError(f"Incorrect LLM provider. Please choose from available clients: {supported_clients}")
+            raise ValueError(f"Incorrect LLM provider. Please choose from supported clients: {supported_clients}")
         if not self.api_key:
             raise ValueError("Please provide a valid API key")
 
@@ -42,7 +44,8 @@ class ProductRelevancy:
         self.llm = LLMAdapter(provider=self.provider, 
                               api_key=self.api_key,
                               ollama_url=self.ollama_url,
-                              model=self.model)
+                              model=self.model,
+                              embedding_model=self.embedding_model)
         
 # Function that takes as input the product_list retrieved by the system via database queries or similarity search
 # Returns an integer that represent the correctly retrieved products based on an LLM response.        

@@ -24,19 +24,21 @@ class AnswerRelevancy:
                  provider:str, 
                  api_key: str | None = None, 
                  ollama_url: str | None = None, 
-                 model: str | None = None):
+                 model: str | None = None,
+                 embedding_model: str| None = None):
         
-        supported_clients = ["openai","anthropic","ollama"]
+        supported_clients = ["openai","ollama"]
         self.provider = provider
         self.api_key = api_key or os.getenv("API_KEY")
         
         #Optional: model, ollama_url (for ollama use)
         self.ollama_url = ollama_url
         self.model = model
+        self.embedding_model = embedding_model
 
         # self.provider must match any of the supported clients
         if self.provider not in supported_clients:
-            raise ValueError(f"Incorrect LLM provider. Please choose from available clients: {supported_clients}")
+            raise ValueError(f"Incorrect LLM provider. Please choose from supported clients: {supported_clients}")
         if not self.api_key:
             raise ValueError("Please provide a valid API key")
 
@@ -44,7 +46,8 @@ class AnswerRelevancy:
         self.llm = LLMAdapter(provider=self.provider, 
                               api_key=self.api_key,
                               ollama_url=self.ollama_url,
-                              model=self.model)
+                              model=self.model,
+                              embedding_model=self.embedding_model)
         
 # Function that takes an llm_answer as input 
 # Returns n number of questions that could be questioned to get the same llm_answer output
@@ -58,6 +61,7 @@ Rules:
 - Questions should reflect the main points of the response.
 - Output each question on a new line.
 - Do NOT include explanations or numbering.
+- You generate ONLY on the original language of the response
 
 Response:
 {llm_answer}
@@ -69,6 +73,7 @@ Response:
             artificial_questions = derived_questions.split("\n")
             for i in range(len(artificial_questions)):
                 artificial_questions[i] = artificial_questions[i].rstrip()
+            logging.info(artificial_questions)
             return artificial_questions
         
         except Exception as error:
@@ -78,7 +83,7 @@ Response:
 # Function that given a text input, it computes the vector embedding of the input and returns it  
     def _compute_similarity(self, input) -> NDArray[np.float32]:
         try:
-            vector_embedding = self.client.embeddings.create(input=input, model="text-embedding-3-small").data[0].embedding
+            vector_embedding = self.llm.get_embedding(input=input)
             return np.array(vector_embedding)
         except Exception as error:
             logging.error(f"Error on Answer Relevancy |_compute_similarity|: {error}")
@@ -96,10 +101,10 @@ Response:
             for answer in artificial_questions:
                 answer_embedding = self._compute_similarity(answer)
                 cosine_similarity = np.dot(query_embedding, answer_embedding) / (np.linalg.norm(query_embedding) * np.linalg.norm(answer_embedding))
-                #logging.info(cosine_similarity)
+                logging.info(cosine_similarity)
                 cosine_similarity_sum += cosine_similarity
             answer_relevancy = cosine_similarity_sum / n
-            #logging.info(answer_relevancy)
+            logging.info(answer_relevancy)
             return {
                 "score": answer_relevancy,
                 "generated_questions": artificial_questions
@@ -108,3 +113,6 @@ Response:
         except Exception as error:
             logging.error(f"Error on Answer Relevancy: |_calculate_answer_relevancy|: {error}")
             raise
+
+AnswerRelevancy(provider="ollama",ollama_url="http://172.16.5.5:11434",model="granite:3b" ,embedding_model="nomic-embed-text").score("Σε ποιο τηλεφωνο μπορω να επικοινωνησω μαζι σας?",
+                                "Μπορειτε να επικοινωνηεστε μαζι μας στο τηλεφωνο 2102345678")
