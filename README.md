@@ -29,6 +29,7 @@ Or clone the repository:
 git clone https://github.com/christopherkormpos/ragret.git
 cd ragret
 ```
+## Configuration
 You will need to create a .env file and set you enviromental variable "API_KEY" to your providers API key 
 ```bash
 API_KEY=your-api-key-here
