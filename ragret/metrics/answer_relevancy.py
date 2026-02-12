@@ -48,7 +48,7 @@ class AnswerRelevancy:
                               ollama_url=self.ollama_url,
                               model=self.model,
                               embedding_model=self.embedding_model)
-        
+
 # Function that takes an llm_answer as input 
 # Returns n number of questions that could be questioned to get the same llm_answer output
     def _generate_artificial_questions(self, llm_answer, n) -> list[str]:
@@ -104,7 +104,7 @@ Response:
                 logging.info(cosine_similarity)
                 cosine_similarity_sum += cosine_similarity
             answer_relevancy = cosine_similarity_sum / n
-            logging.info(answer_relevancy)
+            #logging.info(answer_relevancy)
             return {
                 "score": answer_relevancy,
                 "generated_questions": artificial_questions
@@ -113,6 +113,3 @@ Response:
         except Exception as error:
             logging.error(f"Error on Answer Relevancy: |_calculate_answer_relevancy|: {error}")
             raise
-
-AnswerRelevancy(provider="ollama",ollama_url="http://172.16.5.5:11434",model="granite:3b" ,embedding_model="nomic-embed-text").score("Σε ποιο τηλεφωνο μπορω να επικοινωνησω μαζι σας?",
-                                "Μπορειτε να επικοινωνηεστε μαζι μας στο τηλεφωνο 2102345678")

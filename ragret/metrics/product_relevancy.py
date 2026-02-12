@@ -98,7 +98,7 @@ Return ONLY a single integer number:
                 "provided_products": len(products),
                 "relevant_products": relevant_products
             }
-            logging.info(product_relevancy_response)
+            #logging.info(product_relevancy_response)
             return product_relevancy_response
         
         except Exception as error:

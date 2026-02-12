@@ -21,7 +21,7 @@ class LLMAdapter:
         }
         self.provider = provider
         self.model = model or self.default_llm_models[self.provider]
-        self.embedding_model = embedding_model
+        self.embedding_model = embedding_model or self.default_embeddings_models[self.provider]
         
         # Check for the provider name and make the client instance accordingly
         if self.provider == "openai":
@@ -68,20 +68,24 @@ class LLMAdapter:
             except Exception as e:
                 raise RuntimeError(
 f"""Ollama generation request failed.
-1. Check if you provided the correct URL and port (eg ollama_url="http://127.0.0.0:11434")\n
-2. Check if you have gemma3:4b model installed (DEFAULT MODEL). 
-If not pull it using: ollama pull gemma3:4b or use a different model you have by stating it on class initialzation as below:\n
+1. Check if you provided the correct URL and port (eg ollama_url="http://127.0.0.0:11434")
+2. There is a possibility you have previous loaded models in memory and you dont have enough RAM/VRAM space for another model.
+Please make sure to clear ollama memory using: ollama stop <model_name> on the machine running ollama
+3. Check if you have gemma3:4b model installed (DEFAULT MODEL).
+If not pull it using: ollama pull gemma3:4b or use a different model you have by stating it on class initialzation as below:
 Metric(provider="ollama", model="gpt-oss:20b")""")
         # Mandatory else statement for correct class initialization
         else:
             raise ValueError(f"Unsupported provider: {self.provider}")
-    
+
+# Function that takes as input the prompt and based on the self.provider and the client
+# it creates a vector embedding by making a request to the self.provider
     def get_embedding(self, input: str) -> list[float]:
         # For OpenAI
         if self.provider == "openai":
             try:
                 response = self.openai_client.embeddings.create(
-                    model= self.embedding_model or self.default_embeddings_models["openai"],
+                    model= self.embedding_model,
                     input=input,
                 )
                 return response.data[0].embedding
@@ -95,7 +99,7 @@ Metric(provider="ollama", model="gpt-oss:20b")""")
                 response = self.session.post(
                     f"{self.base_url}/api/embed",
                     json={
-                        "model": self.embedding_model or self.default_embeddings_models["ollama"],
+                        "model": self.embedding_model,
                         "input": input,
                     },
                     timeout=60,
@@ -108,10 +112,9 @@ Metric(provider="ollama", model="gpt-oss:20b")""")
             except Exception as e:
                 raise RuntimeError(
 f"""Ollama embedding request failed.\n
-1. Check if you provided the correct URL and port(eg ollama_url="http://127.0.0.0:11434")\n
+1. Check if you provided the correct URL and port(eg ollama_url="http://127.0.0.0:11434")
 2. Check if you have nomic-embed-text model installed (DEFAULT MODEL). 
-If not pull it using: ollama pull nomic-embed-text or use a different model you have by stating it on class initialzation as below:\n
+If not pull it using: ollama pull nomic-embed-text or use a different model you have by stating it on class initialzation as below:
 Metric(provider="ollama", embedding_model="embeddinggemma")""")
         else:
             raise ValueError(f"Unsupported provider: {self.provider}")
-

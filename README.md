@@ -43,12 +43,12 @@ Faithfulness(provider="openai", api_key="your-api-key-here")
 <p align="center">
   <picture>
     <source srcset="./images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="./images/supported-models-light.png" alt="supported models" style="height:250px;">
+    <img src="./images/supported-models-light.png" alt="supported models" style="height:150px;">
   </picture> 
 
-**ragret** supports multiple LLM providers for different tasks.<br>
-For text generation (claim extraction, verification), you can use OpenAI, Anthropic, or Ollama.<br>
-For vector embeddings (semantic similarity calculations), OpenAI and Ollama are available.
+**ragret** currently supports only two llm providers for generation and embeddings<br>
+The default models for text generation are gpt-4.1-nano-2025-04-14 for OpenAI and gemma3:4b for Ollama<br>
+For vector embeddings the default models are text-embeddings-small-3 for OpenAI and nomic-embed-text for Ollama.
 
 ## Usage
 All metrics are exposed on upper level. Therefore they can be imported as susch:

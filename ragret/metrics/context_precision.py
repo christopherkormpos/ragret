@@ -1,10 +1,11 @@
-# “Is the retrieved context focused on information that helps answer the question?”
-
 # Context Precision measures how much of the retrieved context is actually useful for answering the user query.
-# It ranges from 0 to 1 with higher scores indicating spot on context retreival
-# To calculate this: (we need ground truth answers)
-# 1. Calculate the precision for each chunk
-# 2. Calculate the mean
+# It ranges from 0 to 1, where higher scores indicate that the retrieved context is highly relevant to the query.
+# 
+# To calculate context precision:
+# 1. Extract factual claims from the retrieved context using an LLM or other method.
+# 2. Compare each claim against the user query to see if it is relevant for answering the query.
+# 3. Compute Context Precision using the formula:
+# Context Precision = (Number of supported claims) / (Total number of retrieved claims)
 import os
 from llm_adapter import LLMAdapter
 import logging
@@ -59,6 +60,7 @@ Rules:
 - Each claim must be self-contained.
 - Output a single string with claims separated by '\n'.
 - Do NOT include explanations or numbering.
+- You generate ONLY on the original language of the context
 
 Context:
 
@@ -139,10 +141,9 @@ NOT_SUPPORTED
                 "supported_claims": supported_claims,
                 "unsupported_claims": unsupported_claims,
             }
-            logging.info(context_precision_response)
+            #logging.info(context_precision_response)
             return context_precision_response
         
         except Exception as error:
             logging.error(f"Error on Context Recall: |_calculate_context_recall|: {error}")
             raise
-

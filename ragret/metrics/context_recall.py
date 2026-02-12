@@ -63,6 +63,7 @@ Rules:
 - Each claim must be self-contained.
 - Output a single string with claims separated by '\n'.
 - Do NOT include explanations or numbering.
+- You generate ONLY on the original language of the context
 
 Context:
 {context}
