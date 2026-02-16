@@ -2,7 +2,8 @@
 .venv/
 venv/
 env/
-
+ragret.egg-info/
+.ragret.egg-info/
 # secrets
 .env
 

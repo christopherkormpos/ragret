@@ -10,13 +10,13 @@
 # Faithfulnes = (Number of claims in the response supported by the retrieved context) / (Total Number of claims in response)
 import os
 import logging
-from llm_adapter import LLMAdapter
+from ragret.utils.llm_adapter import LLMAdapter
 from dotenv import load_dotenv
 load_dotenv()
 
 # Logging configuration for debugging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
@@ -54,16 +54,15 @@ class Faithfulness:
 # Returns a list of strings that represent the claims that are stated in a response.
     def _claim_extractor(self, answer) -> list[str]:
         prompt = f"""
-You are extracting factual claims from an answer.
+Extract explicit factual claims an answer.  
 
 Rules:
-- Extract ONLY factual, checkable claims.
-- Split compound sentences into atomic claims.
-- Output each claim on a new line.
-- Ignore opinions, advice, or speculation.
+- Only extract claims explicitly stated in the text. Do NOT infer or assume.
+- Split compound factual statements only if clearly separable.
 - Each claim must be self-contained.
-- Output a single string with claims separated by '\n'.
-- Do NOT include explanations or numbering.
+- Preserve the original language.
+- Output a single string with claims separated by dollar sign ($).
+- If no factual claims exist, output an empty string.
 
 Answer:
 {answer}
@@ -71,7 +70,7 @@ Answer:
         try:
             derived_response_claims = self.llm.generate(prompt)
             # Make the response a list that splits each sentence on '\n'
-            claims = [c.strip() for c in derived_response_claims.split("\n") if c.strip()]
+            claims = [c.strip() for c in derived_response_claims.split("$") if c.strip()]
             return claims
         
         except Exception as error:
@@ -109,7 +108,7 @@ NOT_SUPPORTED
 # of a response using the fomula: 
 # faithfulness = len(supported llm_response claims) / len(llm_response claims).
 # Supported claims refers to supported RESPONSE claims
-    def score(self, llm_answer, context) -> dict:
+    def score(self, context, llm_answer) -> dict:
         try:
             claims = self._claim_extractor(llm_answer)
             #logging.info(f"Claims: {claims}")

@@ -1,6 +1,6 @@
 import requests
 from openai import OpenAI
-from anthropic import Anthropic
+from ragret.utils.models import DEFAULT_LLM_MODELS, DEFAULT_EMBEDDING_MODELS
 
 # LLMAdapter class for universal client initialization across tools
 class LLMAdapter:
@@ -11,14 +11,8 @@ class LLMAdapter:
                  model: str | None,
                  embedding_model: str | None):
         # Default cheap and fast models
-        self.default_llm_models = {
-            "openai": "gpt-4.1-nano-2025-04-14",
-            "ollama": "gemma3:4b"
-        }
-        self.default_embeddings_models = {
-            "openai": "text-embedding-3-small",
-            "ollama": "nomic-embed-text"
-        }
+        self.default_llm_models = DEFAULT_LLM_MODELS
+        self.default_embeddings_models = DEFAULT_EMBEDDING_MODELS
         self.provider = provider
         self.model = model or self.default_llm_models[self.provider]
         self.embedding_model = embedding_model or self.default_embeddings_models[self.provider]
@@ -68,7 +62,7 @@ class LLMAdapter:
             except Exception as e:
                 raise RuntimeError(
 f"""Ollama generation request failed.
-1. Check if you provided the correct URL and port (eg ollama_url="http://127.0.0.0:11434")
+1. Check if you provided the correct URL and PORT (eg ollama_url="http://127.0.0.0:11434")
 2. There is a possibility you have previous loaded models in memory and you dont have enough RAM/VRAM space for another model.
 Please make sure to clear ollama memory using: ollama stop <model_name> on the machine running ollama
 3. Check if you have gemma3:4b model installed (DEFAULT MODEL).
@@ -112,7 +106,7 @@ Metric(provider="ollama", model="gpt-oss:20b")""")
             except Exception as e:
                 raise RuntimeError(
 f"""Ollama embedding request failed.\n
-1. Check if you provided the correct URL and port(eg ollama_url="http://127.0.0.0:11434")
+1. Check if you provided the correct URL and PORT (eg ollama_url="http://127.0.0.0:11434")
 2. Check if you have nomic-embed-text model installed (DEFAULT MODEL). 
 If not pull it using: ollama pull nomic-embed-text or use a different model you have by stating it on class initialzation as below:
 Metric(provider="ollama", embedding_model="embeddinggemma")""")

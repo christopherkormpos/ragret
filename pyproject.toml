@@ -7,7 +7,7 @@ name = "ragret"
 version = "0.1.0"
 description = "Simple evaluation metrics for Retrieval-Augmented Generation (RAG) systems"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.14 "
 license = { text = "MIT" }
 authors = [
     { name = "Christopher Kormpos" }

@@ -10,12 +10,12 @@
 # 3. Compute recall using the formula:
 # Context Recall = (Number of claims in the retrieved context) / (Total number of claims in referece)
 import os
-from llm_adapter import LLMAdapter
+from ragret.utils.llm_adapter import LLMAdapter
 import logging
 
 # Logging configuration for debugging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
@@ -53,17 +53,15 @@ class ContextRecall:
 # a list of strings that represent the claims that are stated in the context.
     def _claim_extractor(self, context) -> list[str]:
         prompt = f"""
-You are extracting factual claims from retrieved context.
+Extract explicit factual claims from retrieved context.  
 
 Rules:
-- Extract ONLY factual, checkable claims.
-- Split compound sentences into atomic claims.
-- Output each claim on a new line.
-- Ignore background, examples, or rhetorical text.
+- Only extract claims explicitly stated in the text. Do NOT infer or assume.
+- Split compound factual statements only if clearly separable.
 - Each claim must be self-contained.
-- Output a single string with claims separated by '\n'.
-- Do NOT include explanations or numbering.
-- You generate ONLY on the original language of the context
+- Preserve the original language.
+- Output a single string with claims separated by dollar sign ($).
+- If no factual claims exist, output an empty string.
 
 Context:
 {context}
@@ -71,7 +69,7 @@ Context:
         try:
             derived_response_claims = self.llm.generate(prompt)
             # Make the response a list that splits each sentence on '\n'
-            claims = [c.strip() for c in derived_response_claims.split("\n") if c.strip()]
+            claims = [c.strip() for c in derived_response_claims.split("$") if c.strip()]
             return claims
         
         except Exception as error:

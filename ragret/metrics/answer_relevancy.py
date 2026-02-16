@@ -9,13 +9,13 @@
 # 3. Take the average of these cosine similarity scores to get the Answer Relevancy
 import os
 import logging
-from llm_adapter import LLMAdapter
+from ragret.utils.llm_adapter import LLMAdapter
 import numpy as np
 from numpy.typing import NDArray
 
 # Logging configuration for debugging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
@@ -59,7 +59,7 @@ Rules:
 - Generate {n} distinct questions.
 - Each question should be fully answerable by the response.
 - Questions should reflect the main points of the response.
-- Output each question on a new line.
+- Output each question separated by dollar sign ($).
 - Do NOT include explanations or numbering.
 - You generate ONLY on the original language of the response
 
@@ -70,10 +70,10 @@ Response:
             derived_questions = self.llm.generate(prompt)
 
             # Make the response a list that splits each sentence on '\n'
-            artificial_questions = derived_questions.split("\n")
+            artificial_questions = derived_questions.split("$")
             for i in range(len(artificial_questions)):
                 artificial_questions[i] = artificial_questions[i].rstrip()
-            logging.info(artificial_questions)
+            #logging.info(artificial_questions)
             return artificial_questions
         
         except Exception as error:
@@ -92,21 +92,21 @@ Response:
 # Main score answer relevancy function. Calls _generate_artificial_questions function and after making
 # vector embeddings of the user query and the answers generated calculates the answer relevancy metric
 # using the fomula: answer_relevancy = Σ(cosine_similarity) / n
-    def score(self, user_input, llm_answer, n=3) -> dict:
+    def score(self, user_query, llm_answer, n=3) -> dict:
         try:
             artificial_questions = self._generate_artificial_questions(llm_answer,n)
-            query_embedding = self._compute_similarity(user_input)
+            query_embedding = self._compute_similarity(user_query)
             cosine_similarity_sum = 0
             # For every question generated, compare the vector embeddings of the question and the answer
             for answer in artificial_questions:
                 answer_embedding = self._compute_similarity(answer)
                 cosine_similarity = np.dot(query_embedding, answer_embedding) / (np.linalg.norm(query_embedding) * np.linalg.norm(answer_embedding))
-                logging.info(cosine_similarity)
+                #logging.info(cosine_similarity)
                 cosine_similarity_sum += cosine_similarity
             answer_relevancy = cosine_similarity_sum / n
             #logging.info(answer_relevancy)
             return {
-                "score": answer_relevancy,
+                "score": float(answer_relevancy),
                 "generated_questions": artificial_questions
             }
         

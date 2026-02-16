@@ -7,12 +7,12 @@
 # 3. Compute Context Precision using the formula:
 # Context Precision = (Number of supported claims) / (Total number of retrieved claims)
 import os
-from llm_adapter import LLMAdapter
+from ragret.utils.llm_adapter import LLMAdapter
 import logging
 
 # Logging configuration for debugging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
@@ -50,27 +50,23 @@ class ContextPrecision:
 # a list of strings that represent the claims that are stated in the context.
     def _claim_extractor(self, context) -> list[str]:
         prompt = f"""
-You are extracting factual claims from retrieved context.
+Extract explicit factual claims from retrieved context.  
 
 Rules:
-- Extract ONLY factual, checkable claims.
-- Split compound sentences into atomic claims.
-- Output each claim on a new line.
-- Ignore background, examples, or rhetorical text.
+- Only extract claims explicitly stated in the text. Do NOT infer or assume.
+- Split compound factual statements only if clearly separable.
 - Each claim must be self-contained.
-- Output a single string with claims separated by '\n'.
-- Do NOT include explanations or numbering.
-- You generate ONLY on the original language of the context
+- Preserve the original language.
+- Output a single string with claims separated by dollar sign ($).
+- If no factual claims exist, output an empty string.
 
 Context:
-
 {context}
 """
-        print(prompt)
         try:
             derived_response_claims = self.llm.generate(prompt)
             # Make the response a list that splits each sentence on '\n'
-            claims = [c.strip() for c in derived_response_claims.split("\n") if c.strip()]
+            claims = [c.strip() for c in derived_response_claims.split("$") if c.strip()]
             return claims
         except Exception as error:
             logging.error(f"Error on Context Precision: |_claim_extractor| : {error}")
@@ -106,10 +102,10 @@ NOT_SUPPORTED
 # Main score context recall function. Calls both _claim_extractor and claim_checker and calculates the context precision 
 # of a response using the fomula: context precision = len(supported context claims) / len(total context claims).
 # Supported claims refers to supported CONTEXT claims
-    def score(self, context, user_query):
+    def score(self, user_query, context):
         try:
             claims = self._claim_extractor(context)
-            logging.info(f"Claims: {claims}")
+            #logging.info(f"Claims: {claims}")
             # Avoid dividing with zero
             if not claims:
                 context_precision_response = {
@@ -127,10 +123,10 @@ NOT_SUPPORTED
             for claim in claims:
                 if self._claim_checker(claim, user_query):
                     supported_claims.append(claim)
-                    logging.info(f"supported: {supported_claims}")
+                    #logging.info(f"supported: {supported_claims}")
                 else:
                     unsupported_claims.append(claim)
-                    logging.info(f"unsupported: {unsupported_claims}")
+                    #logging.info(f"unsupported: {unsupported_claims}")
             
             # Calculation formula
             context_precision = len(supported_claims) / len(claims)

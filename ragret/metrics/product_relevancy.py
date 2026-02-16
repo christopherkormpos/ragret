@@ -8,12 +8,12 @@
 # 3. Compute metric using the formula:
 # Product Relevancy = (Number of believed relevant products) / (Total number of products)
 import os
-from llm_adapter import LLMAdapter
+from ragret.utils.llm_adapter import LLMAdapter
 import logging
 
 # Logging configuration for debugging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
@@ -49,7 +49,7 @@ class ProductRelevancy:
         
 # Function that takes as input the product_list retrieved by the system via database queries or similarity search
 # Returns an integer that represent the correctly retrieved products based on an LLM response.        
-    def _relevant_product_extractor(self, product_list, user_query) -> int:
+    def _relevant_product_extractor(self, user_query, product_list) -> int:
             prompt = f"""
 You will be given a list of {len(product_list)} products in JSON format.
 These products were returned from a database search.
@@ -89,7 +89,7 @@ Return ONLY a single integer number:
                 return product_relevancy_response
 
             relevant_products = self._relevant_product_extractor(products,user_query)
-            logging.info(relevant_products)
+            #logging.info(relevant_products)
             # Calculation formula
             product_relevancy = relevant_products / len(products)
             
