@@ -25,7 +25,7 @@ class AnswerRelevancy:
                  api_key: str | None = None, 
                  ollama_url: str | None = None, 
                  model: str | None = None,
-                 embedding_model: str| None = None):
+                 embedding_model: str| None = None) -> None:
         
         supported_clients = ["openai","ollama"]
         self.provider = provider
@@ -51,7 +51,7 @@ class AnswerRelevancy:
 
 # Function that takes an llm_answer as input 
 # Returns n number of questions that could be questioned to get the same llm_answer output
-    def _generate_artificial_questions(self, llm_answer, n) -> list[str]:
+    def _generate_artificial_questions(self, llm_answer: str, n) -> list[str]:
         prompt = f"""
 You are generating questions that could be answered by the given response.
 
@@ -81,7 +81,7 @@ Response:
             raise
 
 # Function that given a text input, it computes the vector embedding of the input and returns it  
-    def _compute_similarity(self, input) -> NDArray[np.float32]:
+    def _compute_similarity(self, input: str) -> NDArray[np.float32]:
         try:
             vector_embedding = self.llm.get_embedding(input=input)
             return np.array(vector_embedding)
@@ -92,7 +92,7 @@ Response:
 # Main score answer relevancy function. Calls _generate_artificial_questions function and after making
 # vector embeddings of the user query and the answers generated calculates the answer relevancy metric
 # using the fomula: answer_relevancy = Σ(cosine_similarity) / n
-    def score(self, user_query, llm_answer, n=3) -> dict:
+    def score(self, user_query: str, llm_answer: str, n=3) -> dict:
         try:
             artificial_questions = self._generate_artificial_questions(llm_answer,n)
             query_embedding = self._compute_similarity(user_query)
@@ -111,5 +111,5 @@ Response:
             }
         
         except Exception as error:
-            logging.error(f"Error on Answer Relevancy: |_calculate_answer_relevancy|: {error}")
+            logging.error(f"Error on Answer Relevancy: |score|: {error}")
             raise

@@ -9,7 +9,7 @@ class LLMAdapter:
                  api_key: str, 
                  ollama_url: str | None, 
                  model: str | None,
-                 embedding_model: str | None):
+                 embedding_model: str | None) -> None:
         # Default cheap and fast models
         self.default_llm_models = DEFAULT_LLM_MODELS
         self.default_embeddings_models = DEFAULT_EMBEDDING_MODELS

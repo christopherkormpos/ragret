@@ -15,7 +15,8 @@ authors = [
 
 dependencies = [
     "openai>=1.0.0",
-    "numpy>=1.23.0"
+    "numpy>=1.23.0",
+    "pandas">=3.0.1"
 ]
 
 [project.urls]

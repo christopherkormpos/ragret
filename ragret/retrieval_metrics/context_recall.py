@@ -25,7 +25,7 @@ class ContextRecall:
                  api_key: str | None = None, 
                  ollama_url: str | None = None, 
                  model: str | None = None,
-                 embedding_model: str| None = None):
+                 embedding_model: str| None = None) -> None:
         
         supported_clients = ["openai","ollama"]
         self.provider = provider
@@ -51,7 +51,7 @@ class ContextRecall:
         
 # Function that takes as input the CONTEXT retrieved from the vector db that is present in the data samples and returns 
 # a list of strings that represent the claims that are stated in the context.
-    def _claim_extractor(self, context) -> list[str]:
+    def _claim_extractor(self, retrieved_documents: list[str]) -> list[str]:
         prompt = f"""
 Extract explicit factual claims from retrieved context.  
 
@@ -64,7 +64,7 @@ Rules:
 - If no factual claims exist, output an empty string.
 
 Context:
-{context}
+{retrieved_documents}
 """
         try:
             derived_response_claims = self.llm.generate(prompt)
@@ -78,7 +78,7 @@ Context:
         
 # Function that takes the claim made from the _claim_extractor function and sees wether it is supported by the ANSWER 
 # or not. If yes it returns the output to be added on the supported_claims list.
-    def _claim_checker(self, claim, llm_answer) -> bool:
+    def _claim_checker(self, claim: str, llm_answer: str) -> bool:
         prompt = f"""
 You are checking whether an answer covers a factual claim.
 
@@ -107,9 +107,9 @@ NOT_SUPPORTED
 # Main score context recall function. Calls both _claim_extractor and claim_checker and calculates the context recall 
 # of a response using the fomula: context recall = len(supported context claims) / len(total context claims). 
 # Supported claims refers to supported CONTEXT claims
-    def score(self, context, llm_answer) -> dict:
+    def score(self, retrieved_documents: list[str], llm_answer: str) -> dict:
         try:
-            claims = self._claim_extractor(context)
+            claims = self._claim_extractor(retrieved_documents)
             #logging.info(f"Claims: {claims}")
             # Avoid dividing with zero
             if not claims:
@@ -146,5 +146,5 @@ NOT_SUPPORTED
             return context_recall_response
         
         except Exception as error:
-            logging.error(f"Error on Context Recall: |_calculate_context_recall|: {error}")
+            logging.error(f"Error on Context Recall: |score|: {error}")
             raise

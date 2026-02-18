@@ -22,7 +22,7 @@ class ContextPrecision:
                  api_key: str | None = None, 
                  ollama_url: str | None = None, 
                  model: str | None = None,
-                 embedding_model: str| None = None):
+                 embedding_model: str| None = None) -> None:
         
         supported_clients = ["openai","ollama"]
         self.provider = provider
@@ -48,7 +48,7 @@ class ContextPrecision:
         
 # Function that takes as input the CONTEXT retrieved from the vector db that is present in the data samples and returns 
 # a list of strings that represent the claims that are stated in the context.
-    def _claim_extractor(self, context) -> list[str]:
+    def _claim_extractor(self, retrieved_documents: list[str]) -> list[str]:
         prompt = f"""
 Extract explicit factual claims from retrieved context.  
 
@@ -61,7 +61,7 @@ Rules:
 - If no factual claims exist, output an empty string.
 
 Context:
-{context}
+{retrieved_documents}
 """
         try:
             derived_response_claims = self.llm.generate(prompt)
@@ -74,7 +74,7 @@ Context:
         
 # Function that takes the claim made from the _claim_extractor function and sees whether a retrieved context claim is 
 # relevant for answering the user query
-    def _claim_checker(self, claim, user_query):
+    def _claim_checker(self, claim: str, user_query: str) -> bool:
         prompt = f"""
 You are checking whether a retrieved context claim is relevant to a user question.
 
@@ -102,9 +102,9 @@ NOT_SUPPORTED
 # Main score context recall function. Calls both _claim_extractor and claim_checker and calculates the context precision 
 # of a response using the fomula: context precision = len(supported context claims) / len(total context claims).
 # Supported claims refers to supported CONTEXT claims
-    def score(self, user_query, context):
+    def score(self, user_query: str, retrieved_documents: list[str]):
         try:
-            claims = self._claim_extractor(context)
+            claims = self._claim_extractor(retrieved_documents)
             #logging.info(f"Claims: {claims}")
             # Avoid dividing with zero
             if not claims:
@@ -141,5 +141,5 @@ NOT_SUPPORTED
             return context_precision_response
         
         except Exception as error:
-            logging.error(f"Error on Context Recall: |_calculate_context_recall|: {error}")
+            logging.error(f"Error on Context Recall: |score|: {error}")
             raise

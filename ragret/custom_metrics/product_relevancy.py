@@ -23,7 +23,7 @@ class ProductRelevancy:
                  api_key: str | None = None, 
                  ollama_url: str | None = None, 
                  model: str | None = None,
-                 embedding_model: str| None = None):
+                 embedding_model: str| None = None) -> None:
         
         supported_clients = ["openai","ollama"]
         self.provider = provider

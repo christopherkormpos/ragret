@@ -26,7 +26,7 @@ class Faithfulness:
                  api_key: str | None = None, 
                  ollama_url: str | None = None, 
                  model: str | None = None,
-                 embedding_model: str| None = None):
+                 embedding_model: str| None = None) -> None:
         
         supported_clients = ["openai","ollama"]
         self.provider = provider
@@ -52,7 +52,7 @@ class Faithfulness:
         
 # Function that takes as input the RESPONSE generated from the LLM
 # Returns a list of strings that represent the claims that are stated in a response.
-    def _claim_extractor(self, answer) -> list[str]:
+    def _claim_extractor(self, llm_answer: str) -> list[str]:
         prompt = f"""
 Extract explicit factual claims an answer.  
 
@@ -65,7 +65,7 @@ Rules:
 - If no factual claims exist, output an empty string.
 
 Answer:
-{answer}
+{llm_answer}
 """
         try:
             derived_response_claims = self.llm.generate(prompt)
@@ -80,11 +80,11 @@ Answer:
 # Function that takes the claim made from the _claim_extractor function 
 # and decides wether it is supported from the retrieved CONTEXT or not. 
 # If yes it returns the output to be added on the supported_claims list.
-    def _claim_checker(self, claim, context) -> bool:
+    def _claim_checker(self, claim: str, retrieved_documents: list[str]) -> bool:
         prompt = f"""
 You are checking whether a claim is supported by the given context.
 Context:
-{context}
+{retrieved_documents}
 
 Claim:
 {claim}
@@ -108,7 +108,7 @@ NOT_SUPPORTED
 # of a response using the fomula: 
 # faithfulness = len(supported llm_response claims) / len(llm_response claims).
 # Supported claims refers to supported RESPONSE claims
-    def score(self, context, llm_answer) -> dict:
+    def score(self, retrieved_documents: list[str], llm_answer: str) -> dict:
         try:
             claims = self._claim_extractor(llm_answer)
             #logging.info(f"Claims: {claims}")
@@ -127,7 +127,7 @@ NOT_SUPPORTED
             
             # Check every claim in the list that was returned from _claim_extractor
             for claim in claims:
-                if self._claim_checker(claim, context):
+                if self._claim_checker(claim, retrieved_documents):
                     supported_claims.append(claim)
                     #logging.info(f"supported: {supported_claims}")
                 else:
@@ -147,5 +147,5 @@ NOT_SUPPORTED
             return faithfulness_response
         
         except Exception as error:
-            logging.error(f"Error on Faithfulness: |_calculate_faithfulness|: {error}")
+            logging.error(f"Error on Faithfulness: |score|: {error}")
             raise

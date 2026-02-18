@@ -64,8 +64,8 @@ metric = Faithfulness()
 
 result = metric.score(
     user_query="How can I contact Marmero?",
-    llm_answer="You can contact us via email at marmerostudio@gmail.com.",
-    contexts="FAQ: You can contact us via email..."
+    contexts=["FAQ: You can contact us via email..."],
+    llm_answer="You can contact us via email at marmerostudio@gmail.com."
 )
 print(result)
 ```
@@ -81,7 +81,7 @@ Expected output
 --
 
 ## Contact
-If you encounter any issues or bugs with the application, or if you face difficulties while building the project locally, feel free to reach out to me:
+If you encounter any issues or bugs with the application, feel free to reach out to me:
 
 - **Email**: christopher.kormpos@gmail.com
 - **GitHub**: https://github.com/christopherkormpos
