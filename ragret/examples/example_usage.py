@@ -1,15 +1,32 @@
+from ragret import ContextRecall, ContextPrecision, AnswerRelevancy
+from ragret.evaluators import Evaluator
 import pandas as pd
 from ragret.datasets import example_dataset
-from ragret import ContextRecall, ContextPrecision,AnswerRelevancy
 
 context_recall = ContextRecall(provider="openai")
 context_precision = ContextPrecision(provider="openai")
 answer_relevancy = AnswerRelevancy(provider="openai")
 
+results = Evaluator(example_dataset).calculate(context_recall,answer_relevancy,context_precision)
+
+df = pd.DataFrame(results)
+df.to_csv("evaluation_results.csv", index=False)
+print("Results saved to evaluation_results.csv")
+
+
+
+
+
+
+
+
+
+
+"""
+# FOR DOCUMENTATION PURPOSES
 results = []
 
-for i, record in enumerate(example_dataset):
-    print(f"Evaluating record {i + 1}/{len(example_dataset)}...")
+for record in example_dataset:
     
     answer_relevancy_result = answer_relevancy.score(
         user_query=record["user_query"],
@@ -34,3 +51,4 @@ for i, record in enumerate(example_dataset):
 df = pd.DataFrame(results)
 df.to_csv("evaluation_results.csv", index=False)
 print("Results saved to evaluation_results.csv")
+"""
