@@ -8,6 +8,13 @@
   RAG evaluation with fewer regrets.
 </h2>
 
+<div align="center">
+  <a href="https://img.shields.io/badge/release-v0.0.0-purple"><img alt="Latest release" src="https://img.shields.io/badge/release-v0.0.0-4c2c69"></a>&ensp;
+  <a href="https://img.shields.io/badge/Made_with-Python-blue"><img alt="Made with Python" src="https://img.shields.io/badge/Made_with-Python-09648a"></a>&ensp;
+  <a href="https://img.shields.io/badge/License-MIT_License-green"><img alt="License" src="https://img.shields.io/badge/License-MIT_License-4cb636"></a>&ensp;
+  <a href="https://github/repo-size/christopherkormpos/ragret"><img alt="repo size" src="https://img.shields.io/github/repo-size/christopherkormpos/ragret?color=a0c5f0"></a>
+</div>
+
 **ragret** is a stable, lightweight evaluation framework for Retrieval-Augmented Generation (RAG) systems that doesn’t change often.<br>
 Its goal is simplicity: small, modular metrics that are easy to understand, extend, and integrate into existing pipelines. It was created out of the frustration with other frameworks constantly changing, making code from one version to the next useless. With **ragret**, the focus is clear: simple, implement-as-you-go metrics that you can rely on without having to rewrite your established code or digging through docs to figure out what changed overnight in your favorite framework.
 

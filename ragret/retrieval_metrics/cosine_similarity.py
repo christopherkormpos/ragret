@@ -1,6 +1,7 @@
 # Cosine similarity measures the semantic similarity between the USER INPUT and each of the RETRIEVED DOCUMENTS
 # It returns a list [] that contains the cosine similarity for all the documents in the retrieved context
 import os
+from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter
 import numpy as np
 from numpy.typing import NDArray
@@ -41,12 +42,12 @@ class CosineSimilarity:
                               embedding_model=self.embedding_model)
 
 # Function that given a text input, it computes the vector embedding of the input and returns it  
-    def _compute_similarity(self, input: str) -> NDArray[np.float32]:
+    def _compute_vector_embedding(self, input: str) -> NDArray[np.float32]:
         try:
             vector_embedding = self.llm.get_embedding(input=input)
             return np.array(vector_embedding)
         except Exception as error:
-            logging.error(f"Error on Cosine Similarity |_compute_similarity|: {error}")
+            logging.error(f"Error on Cosine Similarity |_compute_vector_embedding|: {error}")
             raise
 
 # Main score for cosine similarity function. After making the user query and the retrieved documents into 
@@ -54,13 +55,20 @@ class CosineSimilarity:
     def score(self, user_query: str, retrieved_documents: list[str]) -> dict:
         cosine_similarity_matrix = []
         try:
-            user_query_embedding = self._compute_similarity(user_query)
-            # For every question generated, compare the vector embeddings of the question and the retrieved context
-            for document in retrieved_documents:
-                document_embedding = self._compute_similarity(document)
+            # Create a pool of worker threads and using the .map() 
+            # send the user query and the list of the retrieved documents to a separate thread simultaneously
+            with ThreadPoolExecutor() as executor:
+                all_embeddings = list(executor.map(self._compute_vector_embedding, [user_query] + retrieved_documents))
+
+            # The returned result is a list containing the vector embeddings of the user query (on index 0)
+            # and the vector embeddings of the n questions generated and the user input (from index 1 till n-1)
+            user_query_embedding = all_embeddings[0]
+            document_embeddings = all_embeddings[1:]
+            
+            # For each document calculate the cosine similarity to the user query and append it to the final matrix
+            for document_embedding in document_embeddings:
                 cosine_similarity = np.dot(user_query_embedding, document_embedding) / (np.linalg.norm(user_query_embedding) * np.linalg.norm(document_embedding))
                 cosine_similarity_matrix.append(float(cosine_similarity))
-                #logging.info(cosine_similarity_matrix)
             return {
                 "score": cosine_similarity_matrix
             }

@@ -10,6 +10,7 @@
 # 3. Compute recall using the formula:
 # Context Recall = (Number of claims in the retrieved context) / (Total number of claims in referece)
 import os
+from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter
 import logging
 
@@ -124,14 +125,16 @@ NOT_SUPPORTED
             supported_claims = []
             unsupported_claims = []
 
-            # Check every claim in the list that was returned from _claim_extractor
-            for claim in claims:
-                if self._claim_checker(claim, llm_answer):
+            # Create a pool of worker threads and using the .map() send each of the claims to a separate thread simultaneously
+            with ThreadPoolExecutor() as executor:
+                checked = executor.map(lambda claim: self._claim_checker(claim, llm_answer), claims)
+
+            # for each claim and its coresponding result from the ThreadPoolExecutor
+            for claim, is_supported in zip(claims, checked):
+                if is_supported:
                     supported_claims.append(claim)
-                    #logging.info(f"supported: {supported_claims}")
                 else:
                     unsupported_claims.append(claim)
-                    #logging.info(f"unsupported: {unsupported_claims}")
             
             # Calculation formula
             context_recall = len(supported_claims) / len(claims)

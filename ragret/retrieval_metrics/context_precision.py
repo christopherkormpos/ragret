@@ -7,6 +7,7 @@
 # 3. Compute Context Precision using the formula:
 # Context Precision = (Number of supported claims) / (Total number of retrieved claims)
 import os
+from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter
 import logging
 
@@ -119,14 +120,16 @@ NOT_SUPPORTED
             supported_claims = []
             unsupported_claims = []
 
-            # Check every claim in the list that was returned from _claim_extractor
-            for claim in claims:
-                if self._claim_checker(claim, user_query):
+            # Create a pool of worker threads and using the .map() send each of the claims to a separate thread simultaneously
+            with ThreadPoolExecutor() as executor:
+                checked = executor.map(lambda claim: self._claim_checker(claim, user_query), claims) #boolean values returned
+            
+            # for each claim and its coresponding result from the ThreadPoolExecutor
+            for claim, is_supported in zip(claims, checked): 
+                if is_supported:
                     supported_claims.append(claim)
-                    #logging.info(f"supported: {supported_claims}")
                 else:
                     unsupported_claims.append(claim)
-                    #logging.info(f"unsupported: {unsupported_claims}")
             
             # Calculation formula
             context_precision = len(supported_claims) / len(claims)
