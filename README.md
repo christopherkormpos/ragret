@@ -20,7 +20,7 @@ Its goal is simplicity: small, modular metrics that are easy to understand, exte
 
 ## Metrics
 **ragret** provides evaluation metrics for assessing different aspects of RAG system performance.<br>
-It includes both LLM-based and non-LLM-based metrics, which are described with more detail in the [METRICS](docs/METRICS.md) file.<br>
+It includes both LLM-based and non-LLM-based metrics, which are described with more detail in [METRICS](docs/METRICS.md)<br>
 
 - AnswerRelevancy
 - Faithfulness
