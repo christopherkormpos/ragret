@@ -1,14 +1,3 @@
-# “Does the answer cover the important information present in the retrieved context?”
-
-# Context Recall measures how many of the relevant documents (or pieces of information) were successfully retrieved. 
-# It focuses on not missing important results. 
-# Higher recall means fewer relevant documents were left out. 
-# In short, recall is about not missing anything important.
-# To calculate this: 
-# 1. Extract claims from the context
-# 2. Check whether each context claim is covered by the answer
-# 3. Compute recall using the formula:
-# Context Recall = (Number of claims in the retrieved context) / (Total number of claims in referece)
 import os
 from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter

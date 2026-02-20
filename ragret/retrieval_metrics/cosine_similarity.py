@@ -1,5 +1,3 @@
-# Cosine similarity measures the semantic similarity between the USER INPUT and each of the RETRIEVED DOCUMENTS
-# It returns a list [] that contains the cosine similarity for all the documents in the retrieved context
 import os
 from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter

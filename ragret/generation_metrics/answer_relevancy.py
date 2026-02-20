@@ -1,12 +1,3 @@
-# “If we inferred questions from the answer, would they match the user’s question?”
-
-# The Anser Relevancy metric measures how relevant a response is to the user input
-# It ranges from 0 to 1 with higher scores indicating better alignment with the user input
-# To calculate this
-# 1. Generate a set of artificial questions (default is 3) based on the response
-#   These questions are designed to reflect the content of the response
-# 2. Compute the cosine similarity between the embedding of the user input and the embedding of each generated question
-# 3. Take the average of these cosine similarity scores to get the Answer Relevancy
 import os
 import logging
 from concurrent.futures import ThreadPoolExecutor

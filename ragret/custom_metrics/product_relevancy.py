@@ -1,12 +1,3 @@
-# Do the products retrieved from the database match the user's request?
-
-# Product Relevancy measures how many relevant products were retrieved
-# OPTIONAL: Uses an LLM to decide product relevancy based on the search the user made
-# To calculate this: 
-# 1. Extract relevant products from the products retrieved
-# 2. OPTIONAL: With LLM check whether each product is relevant to the user quer
-# 3. Compute metric using the formula:
-# Product Relevancy = (Number of believed relevant products) / (Total number of products)
 import os
 from ragret.utils.llm_adapter import LLMAdapter
 import logging

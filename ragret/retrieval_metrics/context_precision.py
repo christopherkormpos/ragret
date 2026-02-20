@@ -1,11 +1,3 @@
-# Context Precision measures how much of the retrieved context is actually useful for answering the user query.
-# It ranges from 0 to 1, where higher scores indicate that the retrieved context is highly relevant to the query.
-# 
-# To calculate context precision:
-# 1. Extract factual claims from the retrieved context using an LLM or other method.
-# 2. Compare each claim against the user query to see if it is relevant for answering the query.
-# 3. Compute Context Precision using the formula:
-# Context Precision = (Number of supported claims) / (Total number of retrieved claims)
 import os
 from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter

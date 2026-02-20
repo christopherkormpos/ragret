@@ -1,8 +1,3 @@
-# F1 score represents a harmonic mean of precision and recall, balancing both.
-# It ranges from 0 to 1, where higher scores indicate better overall performance of the system.
-#
-# Compute f1-score using the formula:
-# Context f1-score = 2 x (precision x recall)/(precision + recall)
 import logging
 
 # Logging configuration for debugging
