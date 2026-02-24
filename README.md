@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source srcset="./images/ragret-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="./images/ragret-light.png" alt="ragret logo" style="height:200px;">
+    <source srcset="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/ragret-dark.png" media="(prefers-color-scheme: dark)">
+    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/ragret-light.png" alt="ragret logo" height="250">
   </picture>
 </p>
 <h2 align="center">
@@ -9,11 +9,12 @@
 </h2>
 
 <div align="center">
-  <a href="https://img.shields.io/badge/release-v0.0.1-4c2c69"><img alt="Latest release" src="https://img.shields.io/badge/release-v0.0.1-4c2c69"></a>&ensp;
-  <a href="https://img.shields.io/badge/Made_with-Python-09648a"><img alt="Made with Python" src="https://img.shields.io/badge/Made_with-Python-09648a"></a>&ensp;
-  <a href="https://img.shields.io/badge/License-MIT_License-4cb636"><img alt="License" src="https://img.shields.io/badge/License-MIT_License-4cb636"></a>&ensp;
-  <a href="https://img.shields.io/github/repo-size/christopherkormpos/ragret?color=a0c5f0"><img alt="repo size" src="https://img.shields.io/github/repo-size/christopherkormpos/ragret?color=a0c5f0"></a>
+  <a href="https://github.com/christopherkormpos/ragret/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/christopherkormpos/ragret.svg?color=4c2c69"></a>&ensp;
+  <a href="https://pypi.org/project/ragret/"><img alt="PyPi" src="https://img.shields.io/badge/Published_on-PyPI-09648a"></a>&ensp;
+  <a href="https://github.com/christopherkormpos/ragret/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT_License-4cb636"></a>&ensp;
+  <a href="https://github.com/christopherkormpos/ragret"><img alt="repo size" src="https://img.shields.io/github/repo-size/christopherkormpos/ragret?color=a0c5f0"></a>
 </div>
+<br>
 
 **ragret** is a lightweight, stable evaluation framework for Retrieval-Augmented Generation (RAG) systems that is designed for long-term consistency and only the necessary structural updates in mind.<br>
 Its goal is simplicity: small, modular metrics that are easy to understand, extend, and integrate into existing pipelines. It was created out of the frustration with other frameworks constantly changing, making code from one version to the next obsolete and difficult to migrate. With **ragret**, the focus is clear: simple, implement-as-you-go metrics that you can rely on without having to rewrite your established code or digging through docs to figure out what changed overnight in your favorite framework.
@@ -28,7 +29,7 @@ It includes both LLM-based and non-LLM-based metrics, which are described with m
 - ContextRecall
 - CosineSimilarity
 - F1Score
-- ProductRelevancy (for systems related to product recommendation) *Custom*
+- ProductRelevancy *Custom (for systems related to product recommendation)*
 
 ## Installation
 Use `pip` to install the package
@@ -44,8 +45,8 @@ cd ragret
 ## Supported providers
 <p align="center">
   <picture>
-    <source srcset="./images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="./images/supported-models-light.png" alt="supported models" style="height:200px;">
+    <source srcset="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
+    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-light.png" alt="supported models" style="width: 60%; max-height: 200px;">
   </picture> 
 
 **ragret** currently supports only two LLM providers for generation and embeddings.<br>
@@ -98,14 +99,17 @@ answer_relevancy = AnswerRelevancy(provider="openai")
 # Create the evaluator with the dataset
 # Use the calculate() method to evaluate the dataset with the selected metrics
 results = Evaluator(example_dataset).calculate(
-  context_recall,answer_relevancy,context_precision
+  context_recall,
+  answer_relevancy,
+  context_precision
   )
 
+# Finally convert the results into a DataFrame and save the output in the current working directory.
 df = pd.DataFrame(results)
 df.to_csv("evaluation_results.csv", index=False)
 print("Results saved to evaluation_results.csv")
 ```
-With the help of pandas, we can convert our results into a DataFrame and save the output in the current working directory.<br>
+With the help of pandas, we convert our results into a DataFrame and save the output in the current working directory.<br>
 > **Note:** It’s important that the dataset is structured like the example below so that the Evaluator class can work correctly and produce results.
 ```json
 [

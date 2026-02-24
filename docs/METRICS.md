@@ -6,9 +6,10 @@
 Metrics are categorized into `Retrieval metrics` and `Generation metrics`, which constitute the original evaluation metrics. In addition, there are `Custom metrics` that allow users to define their own measures, making the evaluation process more flexible and tailored to specific needs. Furthermore, metrics are distinguished as `LLM-based` and `non-LLM-based`, depending on whether they leverage large language models. All metrics are presented below along with their corresponding tags for clarity and reference.
 
 ## Retrieval Metrics
-### ContextPrecision 
+### Context Precision 
 `LLM-Based`<br>
-*Does the retrieved context provide relevant information to support the answer?*
+*Does the retrieved context provide relevant information to support the answer?*<br>
+
 Context Precision measures how much of the retrieved context is actually useful for answering the user query.<br>
 It ranges from 0 to 1, where higher scores indicate that the retrieved context is highly relevant to the query.<br>
 
@@ -20,7 +21,7 @@ To calculate context precision:
 <img src="../images/doc_images/context_precision.png" alt="metrics-formula" style="height:90px;">
 </p>
 
-### ContextRecall
+### Context Recall
 `LLM-Based`<br>
 *Does the answer cover the important information present in the retrieved context?*
 
@@ -36,10 +37,11 @@ To calculate this:
 <img src="../images/doc_images/context_recall.png" alt="metrics-formula" style="height:90px;">
 </p>
 
-### CosineSimilarity
+### Cosine Similarity
 `Non LLM-Based`<br>
 *Does the retrieved context semantically align with the user query?*
-Cosine similarity measures the semantic similarity between the USER INPUT and each of the RETRIEVED DOCUMENTS.<br>
+
+Cosine similarity measures the semantic similarity between the user input and each of the retrieved documents.<br>
 It returns a list of numbers between 0 and 1 that represent the cosine similarity for all the documents in the retrieved context. <br>
 It is computed using the formula:
 <p align="center">
@@ -49,6 +51,7 @@ It is computed using the formula:
 ### F1Score
 `Non LLM-Based`<br>
 *Does the answer cover the important information in the retrieved context accurately and completely?*
+
 F1 score represents a harmonic mean of precision and recall, balancing both.<br>
 It ranges from 0 to 1, where higher scores indicate better overall performance of the system.<br>
 Compute f1-score using the formula:
@@ -60,6 +63,7 @@ Compute f1-score using the formula:
 ### Faithfulness
 `LLM-Based`<br>
 *Are the claims in the answer supported by the retrieved context?*
+
 The Faithfulness metric measures how factually consistent a response is with the retrieved context. <br>
 It ranges from 0 to 1, with higher scores indicating better consistency.<br>
 A response is considered faithful if all its claims can be supported by the retrieved context.<br>
@@ -71,9 +75,10 @@ To calculate this:
 <img src="../images/doc_images/faithfulness.png" alt="metrics-formula" style="height:90px;">
 </p>
 
-### AnswerRelevancy
+### Answer Relevancy
 `LLM-Based`<br>
 *If we inferred questions from the answer, would they match the user’s question?*
+
 The Anser Relevancy metric measures how relevant a response is to the user input<br>
 It ranges from 0 to 1 with higher scores indicating better alignment with the user input<br>
 To calculate this
@@ -86,7 +91,7 @@ You can calculate the Answer Relevancy using the formula:
 <img src="../images/doc_images/answer_relevancy.png" alt="metrics-formula" style="height:90px;">
 </p>
 
-## Custom Metrics`
+## Custom Metrics
 ### Product Relevancy
 `LLM-Based`<br>
 *Do the products retrieved from the database match the user's request?*
@@ -101,4 +106,4 @@ To calculate this:
 </p>
 <br>
 
-*For guidance on using all these metrics, please refer to the [README](README.md) file.*
+*For guidance on using all these metrics, please refer to the [README](../README.md) file.*
