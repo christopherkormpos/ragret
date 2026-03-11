@@ -1,0 +1,5 @@
+- Change tests to fake/general data
+- Transfer _claim_extractor and _claim_checker on utils with relevant changes
+
+-- stabilize the prompt so it can produce constantly similar results
+--- Addition of token counter metric and cost eval metrics using input counter(provider="openai")

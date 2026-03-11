@@ -3,12 +3,13 @@
 </h2>
 
 ## Overview
-Metrics are categorized into `Retrieval metrics` and `Generation metrics`, which constitute the original evaluation metrics. In addition, there are `Custom metrics` that allow users to define their own measures, making the evaluation process more flexible and tailored to specific needs. Furthermore, metrics are distinguished as `LLM-based` and `non-LLM-based`, depending on whether they leverage large language models. All metrics are presented below along with their corresponding tags for clarity and reference.
+Metrics are categorized into `Retrieval metrics` and `Generation metrics`, which constitute the original evaluation metrics. In addition, there are `Custom metrics` that allow users to define their own measures, making the evaluation process more flexible and tailored to specific needs. Furthermore, metrics are distinguished as <img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> and <img alt="based" src="https://img.shields.io/badge/Non_LLM_Based-4B6395">, depending on whether they leverage large language models. All metrics are presented below along with their corresponding tags for clarity and reference.
 
 ## Retrieval Metrics
 ### Context Precision 
-`LLM-Based`<br>
+<img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>
 *Does the retrieved context provide relevant information to support the answer?*<br>
+Requires: `User Query` and `Retrieved Documents`<br>
 
 Context Precision measures how much of the retrieved context is actually useful for answering the user query.<br>
 It ranges from 0 to 1, where higher scores indicate that the retrieved context is highly relevant to the query.<br>
@@ -22,8 +23,9 @@ To calculate context precision:
 </p>
 
 ### Context Recall
-`LLM-Based`<br>
-*Does the answer cover the important information present in the retrieved context?*
+<img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>
+*Does the answer cover the important information present in the retrieved context?*<br>
+Requires: `Retrieved Documents` and `LLM Answer`<br>
 
 Context Recall measures how many of the relevant documents (or pieces of information) were successfully retrieved.<br>
 It focuses on not missing important results.<br>
@@ -38,8 +40,9 @@ To calculate this:
 </p>
 
 ### Cosine Similarity
-`Non LLM-Based`<br>
-*Does the retrieved context semantically align with the user query?*
+<img alt="based" src="https://img.shields.io/badge/Non_LLM_Based-4B6395"> <br>
+*Does the retrieved context semantically align with the user query?*<br>
+Requires: `User Query` and `Retrieved Documents`<br>
 
 Cosine similarity measures the semantic similarity between the user input and each of the retrieved documents.<br>
 It returns a list of numbers between 0 and 1 that represent the cosine similarity for all the documents in the retrieved context. <br>
@@ -49,8 +52,9 @@ It is computed using the formula:
 </p>
 
 ### F1Score
-`Non LLM-Based`<br>
-*Does the answer cover the important information in the retrieved context accurately and completely?*
+<img alt="based" src="https://img.shields.io/badge/Non_LLM_Based-4B6395"> <br>
+*Does the answer cover the important information in the retrieved context accurately and completely?*<br>
+Requires: `Context Precision` and `Context Recall`<br>
 
 F1 score represents a harmonic mean of precision and recall, balancing both.<br>
 It ranges from 0 to 1, where higher scores indicate better overall performance of the system.<br>
@@ -61,8 +65,9 @@ Compute f1-score using the formula:
 
 ## Generation Metrics
 ### Faithfulness
-`LLM-Based`<br>
-*Are the claims in the answer supported by the retrieved context?*
+<img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>
+*Are the claims in the answer supported by the retrieved context?*<br>
+Requires: `Retrieved Documents` and `LLM Answer`<br>
 
 The Faithfulness metric measures how factually consistent a response is with the retrieved context. <br>
 It ranges from 0 to 1, with higher scores indicating better consistency.<br>
@@ -76,8 +81,9 @@ To calculate this:
 </p>
 
 ### Answer Relevancy
-`LLM-Based`<br>
-*If we inferred questions from the answer, would they match the user’s question?*
+<img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>
+*If we inferred questions from the answer, would they match the user’s question?*<br>
+Requires: `User Query` and `LLM Answer`<br>
 
 The Anser Relevancy metric measures how relevant a response is to the user input<br>
 It ranges from 0 to 1 with higher scores indicating better alignment with the user input<br>
@@ -93,8 +99,10 @@ You can calculate the Answer Relevancy using the formula:
 
 ## Custom Metrics
 ### Product Relevancy
-`LLM-Based`<br>
-*Do the products retrieved from the database match the user's request?*
+<img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>
+*Do the products retrieved from the database match the user's request?* <br>
+Requires: `User Query` and `Products Retrieved`<br>
+
 Product Relevancy measures how many relevant products were retrieved<br>
 >OPTIONAL: Use real human labels to decide product relevancy based on the search the user made
 To calculate this: 

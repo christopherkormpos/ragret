@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ragret"
-version = "0.1.2"
+version = "0.1.1"
 description = "Lightweight evaluation framework for Retrieval Augmented Generation systems, focused on simplicity and long-term consistency."
 readme = "README.md"
 requires-python = ">=3.9"

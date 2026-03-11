@@ -36,7 +36,11 @@ Use `pip` to install the package
 ```bash
 pip install ragret
 ```
-Or clone the repository locally:
+Or
+```bash
+pip install git+https://github.com/christopherkormpos/ragret.git
+```
+Or you can clone the repository locally:
 ```bash
 git clone https://github.com/christopherkormpos/ragret.git
 cd ragret
