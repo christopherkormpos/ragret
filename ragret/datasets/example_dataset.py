@@ -1,16 +1,29 @@
 example_dataset = [
     {
-        "user_query": "Εχετε κοσμηματα miyuki?",
-        "retrieved_documents": ["Το καταστημα μας εχει κοσμηματα και χαντρες απο διαφορα ειδη ενα εκ των οποιων και το miyuki", 
-                    ". κοσμηματα με χαντρες η miyuki κοσμηματα δεν επιστρεφονται αν ανοιχτουν", 
-                    "Οπως παραλαβατε ενα προιον θα πρεπει με τον ιδιο τροπο να επιστρεφται"],
-        "llm_answer": "Βεβαιως! Στο καταστημα μας εχουμε πολλα κοσμηματα μαζι και miyuki χαντρες"
+        "user_query": "What are your store hours?",
+        "retrieved_documents": [
+            "Our store is open Monday through Friday from 9am to 6pm.",
+            "On weekends our store is open from 10am to 4pm.",
+            "Our store carries a wide variety of products across multiple categories."
+        ],
+        "llm_answer": "We are open Monday to Friday 9am-6pm and weekends 10am-4pm. We are closed on public holidays."
     },
     {
-        "user_query": "Πως μπορω να επικοινωνησω μαζι σας?",
-        "retrieved_documents": ["Το email επικοινωνιας ειναι το marmero@gmail.com στο οποιο δεχομαστε και παραγγελειες", 
-                    "... το τηλεφωνο μας σε περιπτωση που θελετε αμεση επικοιωνια μαζι μας ειναι το 2102345678", 
-                    "Marmero σημαινει επικοινωνια με το περιβαλλον την φυση και τον κοσμο."],
-        "llm_answer": "Μπορειτε να μας στειλετε email στο marmero@gmail.com η να μας παρετε τηλεφωνο στο 2102345678"
+        "user_query": "Do you offer free shipping?",
+        "retrieved_documents": [
+            "Orders over $50 qualify for free standard shipping within the US.",
+            "Expedited and international shipping are always charged at standard rates.",
+            "Free shipping is automatically applied at checkout when the order total meets the threshold."
+        ],
+        "llm_answer": "Yes, orders over $50 get free standard shipping within the US, applied automatically at checkout."
+    },
+    {
+        "user_query": "What is your return policy?",
+        "retrieved_documents": [
+            "Items can be returned within 30 days of purchase for a full refund.",
+            "Products must be unused and in their original packaging to be eligible for a return.",
+            "Digital downloads and gift cards are non-refundable."
+        ],
+        "llm_answer": "You can return unused items in original packaging within 30 days for a full refund. Digital downloads and gift cards cannot be returned."
     }
 ]

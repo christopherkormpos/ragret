@@ -1,6 +1,7 @@
 import inspect
 import re
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 # Logging configuration for debugging
@@ -44,20 +45,17 @@ class Evaluator:
         # we only need the score result number from each succesfull run
         return metric.score(**kwargs)["score"]
 
-    # Loops through every record in the dataset, runs all metrics on each, returns a list of result dicts
+    # Loops through every record in the dataset, runs all metrics in parallel on each, returns a list of result dicts
     def calculate(self, *metrics) -> list[dict]:
         results = []
         try:
-            # For each record in the dataset provided
             for record in tqdm(self.dataset, desc="Evaluating"):
-                record_result = {}
-                # For each metric provided in the calculate function
-                for metric in metrics:
-                    # First get the name of the metric correct
-                    name = self._get_metric_name(metric)
-                    # return the score result of the metric
-                    record_result[name] = self._call_metric(metric, record)
-                # Finally append all of the metrics scores to the results table
+                with ThreadPoolExecutor() as executor:
+                    futures = {
+                        self._get_metric_name(metric): executor.submit(self._call_metric, metric, record)
+                        for metric in metrics
+                    }
+                record_result = {name: future.result() for name, future in futures.items()}
                 results.append(record_result)
 
         except Exception as error:

@@ -37,6 +37,7 @@ class LLMAdapter:
                 response = self.openai_client.responses.create(
                     model=self.model,
                     input=prompt,
+                    temperature=0,
                 )
                 return response.output_text.strip()
 

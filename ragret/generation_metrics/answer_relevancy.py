@@ -48,12 +48,16 @@ class AnswerRelevancy:
 You are generating questions that could be answered by the given response.
 
 Rules:
-- Generate {n} distinct questions.
-- Each question should be fully answerable by the response.
-- Questions should reflect the main points of the response.
-- Output each question separated by dollar sign ($).
-- Do NOT include explanations or numbering.
-- You generate ONLY on the original language of the response
+- Generate exactly {n} distinct questions.
+- Each question must be fully answerable by the response alone.
+- Each question must cover a different main point of the response.
+- Output each question separated by a dollar sign ($) with no spaces around it.
+- Do NOT include explanations, numbering, or any other text.
+- Use only the original language of the response.
+
+Example:
+Response: "We are open Monday to Friday 9am-6pm. Free shipping applies on orders over $50."
+Output: "What are the opening hours?$When does free shipping apply?"
 
 Response:
 {llm_answer}

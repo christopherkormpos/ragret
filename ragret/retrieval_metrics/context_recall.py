@@ -1,6 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter
+from ragret.utils.claim_utils import extract_claims_from_context, check_claim_against_answer
 import logging
 
 # Logging configuration for debugging
@@ -10,17 +11,17 @@ logging.basicConfig(
 )
 
 class ContextRecall:
-    def __init__(self, 
-                 provider:str, 
-                 api_key: str | None = None, 
-                 ollama_url: str | None = None, 
+    def __init__(self,
+                 provider:str,
+                 api_key: str | None = None,
+                 ollama_url: str | None = None,
                  model: str | None = None,
                  embedding_model: str| None = None) -> None:
-        
+
         supported_clients = ["openai","ollama"]
         self.provider = provider
         self.api_key = api_key or os.getenv("API_KEY")
-        
+
         #Optional: model, ollama_url (for ollama use)
         self.ollama_url = ollama_url
         self.model = model
@@ -32,74 +33,19 @@ class ContextRecall:
         if not self.api_key:
             raise ValueError("Please provide a valid API key")
 
-        # Based on the provider 
-        self.llm = LLMAdapter(provider=self.provider, 
+        # Based on the provider
+        self.llm = LLMAdapter(provider=self.provider,
                               api_key=self.api_key,
                               ollama_url=self.ollama_url,
                               model=self.model,
                               embedding_model=self.embedding_model)
-        
-# Function that takes as input the CONTEXT retrieved from the vector db that is present in the data samples and returns 
-# a list of strings that represent the claims that are stated in the context.
-    def _claim_extractor(self, retrieved_documents: list[str]) -> list[str]:
-        prompt = f"""
-Extract explicit factual claims from retrieved context.  
 
-Rules:
-- Only extract claims explicitly stated in the text. Do NOT infer or assume.
-- Split compound factual statements only if clearly separable.
-- Each claim must be self-contained.
-- Preserve the original language.
-- Output a single string with claims separated by dollar sign ($).
-- If no factual claims exist, output an empty string.
-
-Context:
-{retrieved_documents}
-"""
-        try:
-            derived_response_claims = self.llm.generate(prompt)
-            # Make the response a list that splits each sentence on '\n'
-            claims = [c.strip() for c in derived_response_claims.split("$") if c.strip()]
-            return claims
-        
-        except Exception as error:
-            logging.error(f"Error on Context Recall: |_claim_extractor| : {error}")
-            raise
-        
-# Function that takes the claim made from the _claim_extractor function and sees wether it is supported by the ANSWER 
-# or not. If yes it returns the output to be added on the supported_claims list.
-    def _claim_checker(self, claim: str, llm_answer: str) -> bool:
-        prompt = f"""
-You are checking whether an answer covers a factual claim.
-
-Claim
-{claim}
-
-Answer:
-{llm_answer}
-
-Decide if the claim is:
-- SUPPORTED: clearly states or implies the claim
-- NOT_SUPPORTED: does not mention or imply the claim
-
-Answer with exactly one label:
-SUPPORTED
-NOT_SUPPORTED
-"""
-        try:
-            check_result = self.llm.generate(prompt)
-            return check_result.strip().upper() == "SUPPORTED"
-        
-        except Exception as error:
-            logging.error(f"Error on Context Recall: |_claim_checker| : {error}")
-            raise
-
-# Main score context recall function. Calls both _claim_extractor and claim_checker and calculates the context recall 
-# of a response using the fomula: context recall = len(supported context claims) / len(total context claims). 
+# Main score context recall function. Calculates the context recall
+# of a response using the fomula: context recall = len(supported context claims) / len(total context claims).
 # Supported claims refers to supported CONTEXT claims
     def score(self, retrieved_documents: list[str], llm_answer: str) -> dict:
         try:
-            claims = self._claim_extractor(retrieved_documents)
+            claims = extract_claims_from_context(self.llm, retrieved_documents)
             #logging.info(f"Claims: {claims}")
             # Avoid dividing with zero
             if not claims:
@@ -110,13 +56,13 @@ NOT_SUPPORTED
                     "unsupported_claims": [],
                 }
                 return context_recall_response
-            
+
             supported_claims = []
             unsupported_claims = []
 
             # Create a pool of worker threads and using the .map() send each of the claims to a separate thread simultaneously
             with ThreadPoolExecutor() as executor:
-                checked = executor.map(lambda claim: self._claim_checker(claim, llm_answer), claims)
+                checked = executor.map(lambda claim: check_claim_against_answer(self.llm, claim, llm_answer), claims)
 
             # for each claim and its coresponding result from the ThreadPoolExecutor
             for claim, is_supported in zip(claims, checked):
@@ -124,10 +70,10 @@ NOT_SUPPORTED
                     supported_claims.append(claim)
                 else:
                     unsupported_claims.append(claim)
-            
+
             # Calculation formula
             context_recall = len(supported_claims) / len(claims)
-            
+
             context_recall_response = {
                 "score": context_recall,
                 "claims": claims,
@@ -136,7 +82,7 @@ NOT_SUPPORTED
             }
             #logging.info(context_recall_response)
             return context_recall_response
-        
+
         except Exception as error:
             logging.error(f"Error on Context Recall: |score|: {error}")
             raise
