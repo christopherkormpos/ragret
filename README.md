@@ -50,11 +50,11 @@ cd ragret
 <p align="center">
   <picture>
     <source srcset="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-light.png" alt="supported models" style="width: 60%; max-height: 200px;">
+    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-light.png" alt="supported models" style="width: 60%; max-height: 220px;">
   </picture> 
 
 **ragret** currently supports only two LLM providers for generation and embeddings.<br>
-The default models for text generation are `gpt-4.1-nano` for **OpenAI** and `gemma3:4b` for **Ollama**.<br>
+The default models for text generation are `gpt-4.1` for **OpenAI** and `gemma3:4b` for **Ollama**.<br>
 For vector embeddings, the default models are `text-embeddings-small-3` for **OpenAI** and `nomic-embed-text` for **Ollama**.
 
 ## Basic Configuration
