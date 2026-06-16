@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 from ragret.utils.llm_adapter import LLMAdapter
-from ragret.utils.claim_utils import extract_claims_from_context, check_claim_against_answer
+from ragret.utils.claim_utils import extract_claims_from_ground_truth, check_claim_against_context
 import logging
 
 # Logging configuration for debugging
@@ -41,11 +41,11 @@ class ContextRecall:
                               embedding_model=self.embedding_model)
 
 # Main score context recall function. Calculates the context recall
-# of a response using the fomula: context recall = len(supported context claims) / len(total context claims).
-# Supported claims refers to supported CONTEXT claims
-    def score(self, retrieved_documents: list[str], llm_answer: str) -> dict:
+# of a response using the fomula: context recall = len(supported ground-truth claims) / len(total ground-truth claims).
+# Supported claims refers to GROUND-TRUTH claims that are supported by the retrieved context.
+    def score(self, retrieved_documents: list[str], ground_truth: str) -> dict:
         try:
-            claims = extract_claims_from_context(self.llm, retrieved_documents)
+            claims = extract_claims_from_ground_truth(self.llm, ground_truth)
             #logging.info(f"Claims: {claims}")
             # Avoid dividing with zero
             if not claims:
@@ -62,7 +62,7 @@ class ContextRecall:
 
             # Create a pool of worker threads and using the .map() send each of the claims to a separate thread simultaneously
             with ThreadPoolExecutor() as executor:
-                checked = executor.map(lambda claim: check_claim_against_answer(self.llm, claim, llm_answer), claims)
+                checked = executor.map(lambda claim: check_claim_against_context(self.llm, claim, retrieved_documents), claims)
 
             # for each claim and its coresponding result from the ThreadPoolExecutor
             for claim, is_supported in zip(claims, checked):

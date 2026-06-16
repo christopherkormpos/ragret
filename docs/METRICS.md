@@ -24,16 +24,16 @@ To calculate context precision:
 
 ### Context Recall
 <img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>
-*Does the answer cover the important information present in the retrieved context?*<br>
-Requires: `Retrieved Documents` and `LLM Answer`<br>
+*Does the retrieved context contain the information needed to produce the ground-truth answer?*<br>
+Requires: `Retrieved Documents` and `Ground Truth`<br>
 
-Context Recall measures how many of the relevant documents (or pieces of information) were successfully retrieved.<br>
+Context Recall measures how much of the ground-truth (reference) answer is actually backed by the retrieved context.<br>
 It focuses on not missing important results.<br>
-Higher recall means fewer relevant documents were left out. 
+Higher recall means fewer pieces of the ground truth were left unretrieved.
 In short, recall is about not missing anything important.
 To calculate this: 
-1. Extract claims from the context
-2. Check whether each context claim is covered by the answer
+1. Extract claims from the ground-truth answer
+2. Check whether each ground-truth claim is supported by the retrieved context
 3. Compute recall using the formula:
 <p align="center">
 <img src="../images/doc_images/context_recall.png" alt="metrics-formula" style="height:90px;">

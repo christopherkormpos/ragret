@@ -9,7 +9,7 @@
 </h2>
 
 <div align="center">
-  <a href="https://github.com/christopherkormpos/ragret/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/christopherkormpos/ragret.svg?color=4c2c69"></a>&ensp;
+  <a href="https://github.com/christopherkormpos/ragret/releases"><img alt="Latest release" src="https://img.shields.io/pypi/v/ragret?color=4c2c69&label=release"></a>&ensp;
   <a href="https://pypi.org/project/ragret/"><img alt="PyPi" src="https://img.shields.io/badge/Published_on-PyPI-09648a"></a>&ensp;
   <a href="https://github.com/christopherkormpos/ragret/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT_License-4cb636"></a>&ensp;
   <a href="https://github.com/christopherkormpos/ragret"><img alt="repo size" src="https://img.shields.io/github/repo-size/christopherkormpos/ragret?color=a0c5f0"></a>
@@ -50,7 +50,7 @@ cd ragret
 <p align="center">
   <picture>
     <source srcset="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-light.png" alt="supported models" style="width: 60%; max-height: 220px;">
+    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-light.png" alt="supported models" style="width: 60%; max-height: 250px;">
   </picture> 
 
 **ragret** currently supports only two LLM providers for generation and embeddings.<br>
@@ -122,14 +122,16 @@ With the help of pandas, we convert our results into a DataFrame and save the ou
         "retrieved_documents": ["Retrieved document text 1", 
                                 "Retrieved document text 2", 
                                 "Retrieved document text 3"],
-        "llm_answer": "LLM Answer for Question 1"
+        "llm_answer": "LLM Answer for Question 1",
+        "ground_truth": "Ground-truth (reference) answer for Question 1"
     },
     {
         "user_query": "User Question 2",
         "retrieved_documents": ["Retrieved document text 1", 
                                 "Retrieved document text 2", 
                                 "Retrieved document text 3"],
-        "llm_answer": "LLM Answer for Question 2"
+        "llm_answer": "LLM Answer for Question 2",
+        "ground_truth": "Ground-truth (reference) answer for Question 2"
     },...
 ]
 ```
@@ -158,7 +160,7 @@ for i,record in enumerate(example_dataset):
 
     recall_result = context_recall.score(
         retrieved_documents=record["retrieved_documents"],
-        llm_answer=record["llm_answer"]
+        ground_truth=record["ground_truth"]
     )["score"]
     
     precision_result = context_precision.score(

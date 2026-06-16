@@ -28,6 +28,33 @@ Answer:
         raise
 
 
+def extract_claims_from_ground_truth(llm, ground_truth: str) -> list[str]:
+    prompt = f"""
+Extract explicit factual claims from a ground-truth (reference) answer.
+
+Rules:
+- Only extract claims explicitly stated in the text. Do NOT infer or assume.
+- Each claim must contain exactly one subject and one fact. Never combine two facts into one claim.
+- Each claim must be self-contained and independently verifiable.
+- Preserve the original language.
+- Output a single string with claims separated by dollar sign ($).
+- If no factual claims exist, output an empty string.
+
+Example:
+Ground truth: "Orders over $50 ship free within the US. International shipping is charged at standard rates."
+Output: "Orders over $50 ship free within the US$International shipping is charged at standard rates"
+
+Ground truth:
+{ground_truth}
+"""
+    try:
+        result = llm.generate(prompt)
+        return [c.strip() for c in result.split("$") if c.strip()]
+    except Exception as error:
+        logging.error(f"Error in extract_claims_from_ground_truth: {error}")
+        raise
+
+
 def extract_claims_from_context(llm, retrieved_documents: list[str]) -> list[str]:
     prompt = f"""
 Extract explicit factual claims from retrieved context.
@@ -77,32 +104,6 @@ NOT_SUPPORTED
         return result.strip().upper() == "SUPPORTED"
     except Exception as error:
         logging.error(f"Error in check_claim_against_context: {error}")
-        raise
-
-
-def check_claim_against_answer(llm, claim: str, llm_answer: str) -> bool:
-    prompt = f"""
-You are checking whether an answer covers a factual claim.
-
-Claim
-{claim}
-
-Answer:
-{llm_answer}
-
-Decide if the claim is:
-- SUPPORTED: clearly states or implies the claim
-- NOT_SUPPORTED: does not mention or imply the claim
-
-Answer with exactly one label:
-SUPPORTED
-NOT_SUPPORTED
-"""
-    try:
-        result = llm.generate(prompt)
-        return result.strip().upper() == "SUPPORTED"
-    except Exception as error:
-        logging.error(f"Error in check_claim_against_answer: {error}")
         raise
 
 

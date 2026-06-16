@@ -10,12 +10,12 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-REQUIRED_KEYS = {"user_query", "retrieved_documents", "llm_answer"}
+REQUIRED_KEYS = {"user_query", "retrieved_documents", "llm_answer", "ground_truth"}
 
 class Evaluator:
     def __init__(self, dataset: list[dict]) -> None:
         if not isinstance(dataset, list) or len(dataset) == 0:
-            raise ValueError(f"Dataset must be a non-empty list of dictionaries with keys: |user_query|,|retrieved_documents|,|llm_answer|")
+            raise ValueError(f"Dataset must be a non-empty list of dictionaries with keys: |user_query|,|retrieved_documents|,|llm_answer|,|ground_truth|")
         self.dataset = dataset
 
     # Function that converts CamelCase class name to snake_case for the results dictionary
@@ -37,6 +37,8 @@ class Evaluator:
                 kwargs['retrieved_documents'] = record['retrieved_documents']
             if 'llm_answer' in params:
                 kwargs['llm_answer'] = record['llm_answer']
+            if 'ground_truth' in params:
+                kwargs['ground_truth'] = record['ground_truth']
 
         except Exception as error:
             logging.error(f"Error on Evaluator: |_call_metric|: {error}")

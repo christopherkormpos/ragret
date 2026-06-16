@@ -20,7 +20,7 @@ for i,record in enumerate(example_dataset):
 
     recall_result = context_recall.score(
         retrieved_documents=record["retrieved_documents"],
-        llm_answer=record["llm_answer"]
+        ground_truth=record["ground_truth"]
     )["score"]
     
     precision_result = context_precision.score(
