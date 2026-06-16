@@ -12,7 +12,6 @@
   <a href="https://github.com/christopherkormpos/ragret/releases"><img alt="Latest release" src="https://img.shields.io/pypi/v/ragret?color=4c2c69&label=release"></a>&ensp;
   <a href="https://pypi.org/project/ragret/"><img alt="PyPi" src="https://img.shields.io/badge/Published_on-PyPI-09648a"></a>&ensp;
   <a href="https://github.com/christopherkormpos/ragret/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT_License-4cb636"></a>&ensp;
-  <a href="https://github.com/christopherkormpos/ragret"><img alt="repo size" src="https://img.shields.io/github/repo-size/christopherkormpos/ragret?color=a0c5f0"></a>
 </div>
 <br>
 
@@ -21,7 +20,7 @@ Its goal is simplicity: small, modular metrics that are easy to understand, exte
 
 ## Metrics
 **ragret** provides evaluation metrics for assessing different aspects of RAG system performance.<br>
-It includes both LLM-based and non-LLM-based metrics, which are described with more detail in [METRICS](docs/METRICS.md)<br>
+It includes both LLM-based and non-LLM-based metrics, which are described with more detail in [METRICS](https://github.com/christopherkormpos/ragret/blob/main/docs/METRICS.md)<br>
 
 - AnswerRelevancy
 - Faithfulness
@@ -192,4 +191,4 @@ If you encounter any issues or bugs with the application, feel free to reach out
 - **LinkedIn**: [LinkedIn Profile](https://www.linkedin.com/in/christopher-kormpos-27808b194/)
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/christopherkormpos/ragret/blob/main/LICENSE) file for details.
