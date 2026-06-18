@@ -28,6 +28,7 @@ It includes both LLM-based and non-LLM-based metrics, which are described with m
 - ContextRecall
 - CosineSimilarity
 - F1Score
+- TokenCounter *Custom (average tokens consumed on RAG system)*
 - ProductRelevancy *Custom (for systems related to product recommendation)*
 
 ## Installation
@@ -49,12 +50,12 @@ cd ragret
 <p align="center">
   <picture>
     <source srcset="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-light.png" alt="supported models" style="width: 60%; max-height: 250px;">
+    <img src="https://raw.githubusercontent.com/christopherkormpos/ragret/main/images/supported-models-light.png" alt="supported models" style="width: 65%; max-height: 250px;">
   </picture> 
 
-**ragret** currently supports only two LLM providers for generation and embeddings.<br>
-The default models for text generation are `gpt-4.1` for **OpenAI** and `gemma3:4b` for **Ollama**.<br>
-For vector embeddings, the default models are `text-embeddings-small-3` for **OpenAI** and `nomic-embed-text` for **Ollama**.
+**ragret** currently supports three LLM providers for generation and embeddings.<br>
+The default models for text generation are `gpt-4.1` for **OpenAI**, `gemini-3.1-flash-lite` for **Google** and `gemma3:4b` for **Ollama**.<br>
+For vector embeddings, the default models are `text-embeddings-small-3` for **OpenAI**, `gemini-embedding-2` for **Google** and `nomic-embed-text` for **Ollama**.
 
 ## Basic Configuration
 You will need to create a `.env` file and set your enviromental variable "API_KEY" to your providers API key (if you are using external LLMs)
@@ -70,18 +71,19 @@ Faithfulness(provider="openai", api_key="your-api-key-here")
 All metrics are exposed on upper level. Therefore they can be imported as such:
 ```python
 from ragret import (
-  AnswerRelevancy
-  Faithfulness
-  ContextPrecision
-  ContextRecall
-  CosineSimilarity
-  F1Score
+  AnswerRelevancy,
+  Faithfulness,
+  ContextPrecision,
+  ContextRecall,
+  CosineSimilarity,
+  F1Score,
+  TokenCounter,
   ProductRelevancy
 )
 ```
-Usage may vary depending on what you want to do. There are two ways to evaluate your dataset.
 
-### Use case 1 (Common - Simpler - Faster): Use the Evaluator class
+### Usage of the Evaluator class
+The `Evaluator` is the standard way to run **ragret**. You pass in your dataset, along with the metrics you want, and it returns a result for each metric on every record. All metrics are used this way, with one exception: `TokenCounter`, which runs on its own and is covered in the next section.
 ```python
 # Import the metrics we want to use to evaluate our dataset, evaluator, and example dataset
 from ragret import ContextRecall, ContextPrecision, AnswerRelevancy
@@ -135,53 +137,26 @@ With the help of pandas, we convert our results into a DataFrame and save the ou
 ]
 ```
 
-### Use case 2 : Use the metrics classes directly
+### Usage of TokenCounter metric
+`TokenCounter` is a standalone metric, and it does **not** go through the `Evaluator` class. It takes the whole dataset, rebuilds the input the way your RAG system would (using the `PROMPT` you provide) and returns the average input, output and total tokens across the dataset.
 ```python
-# Import the metrics we want to use to evaluate our dataset, evaluator, and example dataset
-from ragret import ContextRecall, ContextPrecision, AnswerRelevancy
+from ragret import TokenCounter
 from ragret.datasets import example_dataset
-import pandas as pd
 
-# Initialize metric classes with the desired provider.
+# Pass the SAME prompt your RAG system uses with {context} and {query} placeholders.
 # Other optional parameters:
 # - api_key: provide your API key directly
 # - ollama_url: for local LLM models
 # - model: the LLM model name
-# - embedding_model: the embedding model to use
-context_recall = ContextRecall(provider="openai")
-context_precision = ContextPrecision(provider="openai")
-answer_relevancy = AnswerRelevancy(provider="openai")
+token_counter = TokenCounter(
+    provider="openai",
+    prompt_template="Answer the question using the context:\n{context}\n\nQuestion: {query}"
+)
 
-results = []
-# Use a simple for loop to evaluate the dataset with the selected metrics
-for i,record in enumerate(example_dataset):
-    print(f"Evaluating record {i+1} of {len(example_dataset)}")
-
-    recall_result = context_recall.score(
-        retrieved_documents=record["retrieved_documents"],
-        ground_truth=record["ground_truth"]
-    )["score"]
-    
-    precision_result = context_precision.score(
-        user_query=record["user_query"],
-        retrieved_documents=record["retrieved_documents"]
-    )["score"]
-    
-    answer_relevancy_result = answer_relevancy.score(
-        user_query=record["user_query"],
-        llm_answer=record["llm_answer"])["score"]
-
-    results.append({
-        "context_precision": precision_result,
-        "context_recall": recall_result,
-        "answer_relevancy":answer_relevancy_result
-    })
-
-# Finally convert the results into a DataFrame and save the output in the current working directory.
-df = pd.DataFrame(results)
-df.to_csv("evaluation_results.csv", index=False)
-print("Results saved to evaluation_results.csv")
+results = token_counter.score(example_dataset)
+print(results)
 ```
+> **Note:** TokenCounter reports raw token counts only and does not calculate cost. Multiply the averages by your model's per-token pricing to estimate spend, e.g. `avg_input_tokens * input_price + avg_output_tokens * output_price`.
 
 ## Contact
 If you encounter any issues or bugs with the application, feel free to reach out to me:

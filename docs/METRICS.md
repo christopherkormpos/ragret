@@ -114,4 +114,20 @@ To calculate this:
 </p>
 <br>
 
-*For guidance on using all these metrics, please refer to the [README](../README.md) file.*
+### Token Counter
+<img alt="based" src="https://img.shields.io/badge/Non_LLM_Based-4B6395"> <br>
+*How many tokens does your RAG system consume per query?* <br>
+Requires: `User Query`, `Retrieved Documents` and `LLM Answer` **+** the `PROMPT` of your RAG system<br>
+
+Token Counter is not a quality score but a cost and efficiency report. Unlike the other metrics it does not run through the `Evaluator` and does not return a value between 0 and 1. Instead it takes the whole dataset, reconstructs the input exactly as your RAG system would build it (the `PROMPT` filled with the retrieved context and the user query) and counts the tokens of both the input and the `LLM Answer`. Counting is done with the provider's own tokenizer (`tiktoken` for **OpenAI**, `count_tokens` endpoint for **Google**, and a prompt-evaluation call for **Ollama**), so no answer is ever generated and no extra cost is incurred.<br>
+
+It computes input, output and total tokens for every record in your dataset. Once every record is processed it returns the dataset-wide averages: `avg_input_tokens`, `avg_output_tokens` and `avg_total_tokens`.<br>
+To calculate this:
+1. Reconstruct the input for each record from the `prompt_template`, retrieved context and user query
+2. Count the input tokens and the output (`LLM Answer`) tokens with the provider's tokenizer
+3. Average the input, output and total token counts across the whole dataset
+
+> Token Counter reports raw token counts only. To estimate cost, multiply the averages by your model's per-token pricing (e.g. `avg_input_tokens * input_price + avg_output_tokens * output_price`).
+<br>
+
+*For guidance on using all these metrics, please refer to the [README](https://github.com/christopherkormpos/ragret/blob/main/README.md) file.*

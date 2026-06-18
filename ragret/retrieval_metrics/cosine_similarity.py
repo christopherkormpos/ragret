@@ -18,7 +18,7 @@ class CosineSimilarity:
                  ollama_url: str | None = None, 
                  embedding_model: str| None = None) -> None:
         
-        supported_clients = ["openai","ollama"]
+        supported_clients = ["openai","google","ollama"]
         self.provider = provider
         self.api_key = api_key or os.getenv("API_KEY")
         

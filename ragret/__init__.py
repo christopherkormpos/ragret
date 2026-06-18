@@ -1,6 +1,6 @@
 from .generation_metrics import AnswerRelevancy, Faithfulness
 from .retrieval_metrics import ContextPrecision, ContextRecall, CosineSimilarity, F1Score
-from .custom_metrics import ProductRelevancy
+from .custom_metrics import ProductRelevancy, TokenCounter
 
 __all__ = [
     "AnswerRelevancy",
@@ -9,5 +9,6 @@ __all__ = [
     "Faithfulness",
     "CosineSimilarity",
     "F1Score",
-    "ProductRelevancy"
+    "ProductRelevancy",
+    "TokenCounter"
 ]

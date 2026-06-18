@@ -1,2 +1,0 @@
--- stabilize the prompt so it can produce constantly similar results
---- Addition of token counter metric and cost eval metrics using input counter(provider="openai")

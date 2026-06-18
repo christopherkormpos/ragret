@@ -1,5 +1,8 @@
 import requests
 from openai import OpenAI
+import tiktoken
+from google import genai
+from google.genai import types
 from ragret.utils.models import DEFAULT_LLM_MODELS, DEFAULT_EMBEDDING_MODELS
 
 # LLMAdapter class for universal client initialization across tools
@@ -21,9 +24,21 @@ class LLMAdapter:
         if self.provider == "openai":
             try:
                 self.openai_client = OpenAI(api_key=api_key)
+                # The OpenAI SDK imports these sub-resources lazily on first access.
+                # Touch them once here (main thread) so the imports complete before the
+                # metrics call them concurrently from worker threads, which would otherwise
+                # trigger a Python import deadlock (_DeadlockError) under ThreadPoolExecutor.
+                _ = self.openai_client.responses
+                _ = self.openai_client.embeddings
             except Exception as e:
                 raise RuntimeError(f"Failed to initialize OpenAI client: {e}")
-
+        
+        elif self.provider == "google":
+            try:
+                self.google_client = genai.Client(api_key=api_key)
+            except Exception as e:
+                raise RuntimeError(f"Failed to initialize Google client: {e}")
+            
         elif self.provider == "ollama":
             self.base_url = ollama_url or "http://localhost:11434"
             self.session = requests.Session()
@@ -43,7 +58,20 @@ class LLMAdapter:
 
             except Exception as e:
                 raise RuntimeError(f"OpenAI API generation request failed: {e}")
+            
+        # For Google
+        elif self.provider == "google":
+            try:
+                response = self.google_client.models.generate_content(
+                    model=self.model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(temperature=0),
+                )
+                return response.text.strip() #type:ignore
 
+            except Exception as e:
+                raise RuntimeError(f"Google API generation request failed: {e}")
+            
         # For local Ollama models
         elif self.provider == "ollama":
             try:
@@ -88,6 +116,19 @@ Metric(provider="ollama", model="gpt-oss:20b")""")
             except Exception as e:
                 raise RuntimeError(f"OpenAI embedding request failed: {e}")
 
+        # For Google
+        elif self.provider == "google":
+            try:
+                response = self.google_client.models.embed_content(
+                    model= self.embedding_model,
+                    contents=input,
+                    config=types.EmbedContentConfig(output_dimensionality=1536),
+                )
+                return response.embeddings[0].values  # type: ignore
+
+            except Exception as e:
+                raise RuntimeError(f"Google embedding request failed: {e}")
+            
         # For local Ollama models
         elif self.provider == "ollama":
             try:
@@ -111,5 +152,48 @@ f"""Ollama embedding request failed.\n
 2. Check if you have nomic-embed-text model installed (DEFAULT MODEL). 
 If not pull it using: ollama pull nomic-embed-text or use a different model you have by stating it on class initialzation as below:
 Metric(provider="ollama", embedding_model="embeddinggemma")""")
+        else:
+            raise ValueError(f"Unsupported provider: {self.provider}")
+
+    def count_tokens(self, text:str)-> int:
+        #OpenAI -> tiktoken
+        if self.provider == "openai":
+            try:
+                enc = tiktoken.encoding_for_model(self.model)
+            except KeyError:
+                enc = tiktoken.get_encoding("o200k_base") # fallback for unmapped models
+            except Exception as e:
+                raise RuntimeError(f"OpenAI token count failed: {e}")
+            return int(len(enc.encode(text)))
+        
+        #Google -> endpoint request
+        elif self.provider == "google":
+            try:
+                response = self.google_client.models.count_tokens(
+                    model=self.model,
+                    contents=text,
+                )
+                return int(response.total_tokens) # type: ignore
+            except Exception as e:
+                raise RuntimeError(f"Google token count failed: {e}")
+        
+        #Ollama -> local api call
+        elif self.provider == "ollama":
+            try:
+                response = self.session.post(
+                    f"{self.base_url}/api/generate",
+                    json={
+                        "model":self.model,
+                        "prompt":text,
+                        "stream": False,
+                        "options": {"num_predict": 0}
+                    },
+                    timeout=60,
+                )
+                response.raise_for_status()
+                data = response.json()
+                return int(data.get("prompt_eval_count",0))
+            except Exception as e:
+                raise RuntimeError(f"Ollama token counting failed: {e}")
         else:
             raise ValueError(f"Unsupported provider: {self.provider}")
