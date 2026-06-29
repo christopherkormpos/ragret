@@ -63,6 +63,24 @@ Compute f1-score using the formula:
 <img src="../images/doc_images/f1score.png" alt="metrics-formula" style="height:90px;">
 </p>
 
+### MRR (Mean Reciprocal Rank)
+<img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>
+*How high up the ranked results is the first relevant document?*<br>
+Requires: `User Query` and `Retrieved Documents`<br>
+
+MRR measures how early the first relevant document appears in the retrieved results, rewarding retrievers that rank a good document near the top.<br>
+It expects `Retrieved Documents` to be in the retriever's ranked order (best first), and only looks at the **first** relevant hit, ignoring everything after it.<br>
+The per-query score is the *reciprocal rank* (1 divided by the position of the first relevant document), ranging from 0 to 1, where 1 means a relevant document was ranked first and 0 means no relevant document was retrieved.<br>
+To calculate this:
+1. Judge each retrieved document for relevance to the user query (in rank order)
+2. Find the rank of the first relevant document and take its reciprocal rank `1 / rank`
+3. Average the reciprocal ranks across all queries in the dataset to get the MRR:
+<p align="center">
+<img src="../images/doc_images/mrr.png" alt="metrics-formula" style="height:90px;">
+</p>
+
+> **Note:** The `Evaluator` returns the per-query RR for each record. To get the final MRR, average that column across the dataset (or use `MRR.mean(reciprocal_ranks) after RR calculations`).
+
 ## Generation Metrics
 ### Faithfulness
 <img alt="based" src="https://img.shields.io/badge/LLM_Based-DC7F2E"> <br>

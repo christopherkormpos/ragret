@@ -131,3 +131,25 @@ NOT_SUPPORTED
     except Exception as error:
         logging.error(f"Error in check_claim_against_query: {error}")
         raise
+
+def check_document_relevance(llm, document: str, user_query: str) -> bool:
+    prompt = f"""
+You are checking whether a retrieved document is relevant to a user question.
+A document is RELEVANT if it contains information that helps answer the question.
+
+User Question:
+{user_query}
+
+Document:
+{document}
+
+Answer with exactly one label:
+RELEVANT
+NOT_RELEVANT
+"""
+    try:
+        result = llm.generate(prompt)
+        return result.strip().upper() == "RELEVANT"
+    except Exception as error:
+        logging.error(f"Error in check_document_relevance: {error}")
+        raise

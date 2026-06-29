@@ -28,6 +28,7 @@ It includes both LLM-based and non-LLM-based metrics, which are described with m
 - ContextRecall
 - CosineSimilarity
 - F1Score
+- MRR
 - TokenCounter *Custom (average tokens consumed on RAG system)*
 - ProductRelevancy *Custom (for systems related to product recommendation)*
 
@@ -77,6 +78,7 @@ from ragret import (
   ContextRecall,
   CosineSimilarity,
   F1Score,
+  MRR,
   TokenCounter,
   ProductRelevancy
 )
