@@ -5,6 +5,8 @@ name: Release
 on:
   push:
     branches: [main]
+    # Pushes that only touch Markdown files (README, docs) don't make a release
+    paths-ignore: ["**.md"]
 concurrency:
   group: release
   cancel-in-progress: false

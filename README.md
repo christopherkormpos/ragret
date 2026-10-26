@@ -56,7 +56,7 @@ cd ragret
 
 **ragret** currently supports three LLM providers for generation and embeddings.<br>
 The default models for text generation are `gpt-4.1` for **OpenAI**, `gemini-3.1-flash-lite` for **Google** and `gemma3:4b` for **Ollama**.<br>
-For vector embeddings, the default models are `text-embeddings-small-3` for **OpenAI**, `gemini-embedding-2` for **Google** and `nomic-embed-text` for **Ollama**.
+For vector embeddings, the default models are `text-embedding-3-small` for **OpenAI**, `gemini-embedding-2` for **Google** and `nomic-embed-text` for **Ollama**.
 
 ## Basic Configuration
 You will need to create a `.env` file and set your enviromental variable "API_KEY" to your providers API key (if you are using external LLMs)
