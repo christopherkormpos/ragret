@@ -139,6 +139,13 @@ With the help of pandas, we convert our results into a DataFrame and save the ou
 ]
 ```
 
+> **Tip:** If your data is in another format or uses different key names (e.g. ragas-style `{"question": [...], "contexts": [[...]], "answer": [...], "ground_truth": [...]}`), you can make it compatible in just one line with `dataset_converter`:
+> ```python
+> from ragret.datasets import dataset_converter
+>
+> dataset = dataset_converter(your_data)
+> ```
+
 ### Usage of TokenCounter metric
 `TokenCounter` is a standalone metric, and it does **not** go through the `Evaluator` class. It takes the whole dataset, rebuilds the input the way your RAG system would (using the `PROMPT` you provide) and returns the average input, output and total tokens across the dataset.
 ```python

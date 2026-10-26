@@ -1,0 +1,59 @@
+# On every push to main: bump the patch version in pyproject.toml (0.0.1 up),
+# build the package, publish it to PyPI, commit the new version back to main
+# and create a GitHub release for the same version.
+name: Release
+on:
+  push:
+    branches: [main]
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # push the version bump commit
+      id-token: write   # PyPI trusted publishing
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Bump patch version
+        id: bump
+        run: |
+          python - <<'EOF'
+          import os, re
+          path = "pyproject.toml"
+          text = open(path).read()
+          match = re.search(r'^version = "(\d+)\.(\d+)\.(\d+)"', text, re.M)
+          major, minor, patch = match.groups()
+          new_version = f"{major}.{minor}.{int(patch) + 1}"
+          text = text[:match.start()] + f'version = "{new_version}"' + text[match.end():]
+          open(path, "w").write(text)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"version={new_version}\n")
+          print(f"Bumped version to {new_version}")
+          EOF
+      - name: Build package
+        run: |
+          python -m pip install --upgrade "pip>=26.2.2"
+          python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml
+          git commit -m "Bump version to ${{ steps.bump.outputs.version }} [skip ci]"
+          git push
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.bump.outputs.version }}" dist/* \
+            --target "$(git rev-parse HEAD)" \
+            --title "v${{ steps.bump.outputs.version }}" \
+            --generate-notes
